@@ -1,0 +1,7 @@
+.my-navbar {
+  background-color: #13a6b9;
+}
+.my-navbar .navbar-item {
+    font-weight: 500;
+    color: #ffffff;
+}
