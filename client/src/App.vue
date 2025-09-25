@@ -16,7 +16,7 @@
 				</div>
 			</div>
 
-				<div class="navbar-menu">
+			<div class="navbar-menu">
 				<div class="navbar-start">
 					<router-link class="navbar-item" to="/movies">Movies</router-link>
 				</div>
