@@ -9,8 +9,8 @@ const router = createRouter({
 	routes: [
 		{ path: "/", component: Home },
 		{ path: "/seats", component: Seats },
-	    { path: "/movies", component: Movies },
-	]	
+		{ path: "/movies", component: Movies },
+	],
 });
 
 export default router;
