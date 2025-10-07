@@ -1,6 +1,6 @@
 <script setup>
 // example image
-import exampleImage from '../assets/photo1.jpg'
+import exampleImage from '@/assets/Gallerypics/photo1.jpg';
 </script>
 
 <template>
