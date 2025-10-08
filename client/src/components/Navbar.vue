@@ -8,6 +8,7 @@
             <div class="navbar-start">
                 <router-link class="navbar-item" to="/movies">Movies</router-link>
                 <router-link class="navbar-item" to="/seats">Seats</router-link>
+                <router-link class="navbar-item" to="/seat-selector">Seat Selector</router-link>
                 <!-- Hiljem muudame aga praegu on testimiseks -->
             </div>
         </div>

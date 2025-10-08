@@ -61,9 +61,9 @@
 							</div>
 						</div>
 					</div>
-					<button class="button is-success is-fullwidth" @click="buyTickets">
+					<router-link class="button is-primary is-fullwidth" to="seat-selector" @click="buyTickets">
 						Buy Tickets
-					</button>
+					</router-link>
 				</div>
 			</div>
 		</div>
