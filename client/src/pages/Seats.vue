@@ -1,17 +1,15 @@
 <template>
 	<section class="section">
 		<div class="container" style="max-width: 500px">
-			<h1 class="title is-4 has-text-centered">Seat Selection</h1>
-
+			
 			<!-- Film information -->
 			<div class="box mb-4">
+				<h1 class="title is-4 has-text-centered">Seat Selection</h1>
 				<h2 class="subtitle title"><strong>Film Title</strong></h2>
 				<p><strong>Date:</strong> 2024-06-15</p>
 				<p><strong>Time:</strong> 19:30</p>
 				<p><strong>Location:</strong> Cinema Hall 1</p>
-			</div>
-			<!-- Ticket buying -->
-			<div class="box mb-4">
+				
 				<header class="card-header">
 					<h2 class="subtitle title">
 						<strong>Choose seat type and tickets</strong>
@@ -189,5 +187,10 @@ export default {
 
 .button.is-success.is-fullwidth {
 	margin-top: 0.5rem;
+}
+
+.card-header {
+	margin-top: 2rem;
+	margin-bottom: .5rem;
 }
 </style>

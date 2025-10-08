@@ -4,28 +4,29 @@
       <div class="columns" ref>
           <div class="column is-three-quarters">
 				<h2 class="screen subtitle "><strong>Screen</strong></h2>
-              <div class="row is-col-min-2">
+              <div class="cinema-seating">
                 <div
-                v-for="seat in seats"
-                :key="seat"
-                class="cell"
-                :class="{ 'is-selected': selectedSeats.includes(seat) }"
-                @click="toggleSeatSelection(seat)"
+                  v-for="(rowSeats, rowIndex) in seatLayout"
+                  :key="rowIndex"
+                  class="seat-row"
                 >
-                  {{ seat }}
-            </div>
-          </div>
-              <div class="row is-col-min-2">
-                <div
-                v-for="seat in seats"
-                :key="seat"
-                class="cell"
-                :class="{ 'is-selected': selectedSeats.includes(seat) }"
-                @click="toggleSeatSelection(seat)"
-                >
-                {{ seat }}
-            </div>
-        </div>
+                  <div class="row-label">{{ String.fromCharCode(65 + rowIndex) }}</div>
+                  <div class="seats-in-row">
+                    <div
+                      v-for="seat in rowSeats"
+                      :key="seat.id"
+                      class="cell"
+                      :class="{ 
+                        'is-selected': selectedSeats.includes(seat.id),
+                        'is-occupied': seat.occupied
+                      }"
+                      @click="toggleSeatSelection(seat.id)"
+                    >
+                      {{ seat.number }}
+                    </div>
+                  </div>
+                </div>
+              </div>
       </div>
         
 
@@ -38,10 +39,7 @@
 				<p><strong>Seats:</strong> Single</p>
 				<p><strong>Tickets:</strong> {{ tickets }}</p>
 
-
-				<h2 class="Seats subtitle "><strong>Seats remaining:
-                    {{ seatsRemaining }}
-                </strong></h2>
+				<h2 class="Seats subtitle "><strong>Available seats: {{ seatsRemaining }}</strong></h2>
 
                 <button class="button is-primary">Proceed to payment</button>
             </aside>
@@ -54,26 +52,54 @@
 <script setup>
 import { computed } from 'vue'
 import { ref } from 'vue'
-const tickets = 8
 
-const row = ref(Array.from({ length: 5 }, (_, i) => i + 1))
-const seats = ref(Array.from({ length: 25 }, (_, i) => i + 1))
+const tickets = 1
+const numRows = 8
+const seatsPerRow = 15
 
+const seatLayout = ref([])
 const selectedSeats = ref([])
 
-function toggleSeatSelection(seat) {
-  const idx = selectedSeats.value.indexOf(seat)
+function createSeatLayout() {
+  const layout = []
+  for (let row = 0; row < numRows; row++) {
+    const rowSeats = [] // Creates an array that holds seats for each row
+    
+    for (let seat = 1; seat <= seatsPerRow; seat++) {
+      const seatId = `${String.fromCharCode(65 + row)}${seat}`
+      rowSeats.push({
+        id: seatId,
+        number: seat,
+        occupied: false // Math.random() < 0.2
+      })
+    }
+    layout.push(rowSeats)
+  }
+  return layout
+}
+
+seatLayout.value = createSeatLayout()
+
+function toggleSeatSelection(seatId) {
+  const seat = seatLayout.value.flat().find(s => s.id === seatId)
+  if (seat && seat.occupied) {
+    return 
+  }
+
+  const idx = selectedSeats.value.indexOf(seatId)
   if (idx === -1) {
-    selectedSeats.value.push(seat)
+    selectedSeats.value.push(seatId)
   } else {
     selectedSeats.value.splice(idx, 1)
   }
+  
   if (selectedSeats.value.length > tickets) {
     selectedSeats.value.splice(0, selectedSeats.value.length - tickets)
   }
 }
 
-const seatsRemaining = computed(() => seats.value.length - selectedSeats.value.length)
+const totalSeats = computed(() => seatLayout.value.flat().filter(seat => !seat.occupied).length)
+const seatsRemaining = computed(() => totalSeats.value - selectedSeats.value.length)
 
 </script>
 
@@ -83,38 +109,60 @@ const seatsRemaining = computed(() => seats.value.length - selectedSeats.value.l
   align-items: center;
   justify-content: center;
   display: flex;
+  margin-bottom: 2rem;
 }
 
-.row {
+.cinema-seating {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.cell {
+.seat-row {
+  display: flex;
+  align-items: center;
+}
+
+.row-label {
   width: 2rem;
   height: 2rem;
-  min-width: 1rem;
-  font-size: calc(.6rem + .8vw);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  font-weight: bold;
+  color: #666;
+}
+
+.seats-in-row {
+  display: flex;
+  gap: .25rem;
+}
+
+.cell {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
   background: #4d4d4d;
   cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
 }
 
 .cell.is-selected {
   background-color: hsl(171, 100%, 41%);
   color: #000000;
-  border: 1px solid rgba(0,0,0,0.2);
+  border: 2px solid #00d1b2;
 }
 
-.infobox {
-position: relative;
+.cell.is-occupied {
+  background-color: #e74c3c;
+  color: #fff;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
-
-.Seats {
-  margin-top: 3rem;
-}
-
 </style>
