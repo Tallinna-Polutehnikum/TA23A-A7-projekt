@@ -6,67 +6,21 @@ import Filter from '../components/Filter.vue';
 
 <template>
     <!-- Search bar and genre dropdown -->
-    <div class="columns">
+    <div class="filter">
         <Filter></Filter>
     </div>
     <!-- Film cards grid -->
-    <div class="columns is-multiline">
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-
-        <!--for grid test purpposes-->
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
-        </div>
-        <div class="column is-one-quarter">
-            <FilmCard></FilmCard>
+    <div class="films">
+        <div class="columns is-multiline">
+            <div class="column is-one-quarter">
+                <FilmCard></FilmCard>
+            </div>
         </div>
     </div>
     <!-- Pagination buttons -->
-    <div class="columns">
+    <div class="pagination">
         <Pagination></Pagination>
     </div>
-
 </template>
 
 <style scoped></style>
