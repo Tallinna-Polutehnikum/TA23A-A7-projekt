@@ -1,6 +1,13 @@
 <script setup>
+import { ref } from 'vue';
+
+const isOpen = ref(false);
+
+const arrow = ref('fa-angle-down');
+
 function toggleDropdown() {
-    console.log("Dropdown clicked");
+    isOpen.value = !isOpen.value;
+    arrow.value = isOpen.value ? 'fa-angle-up' : 'fa-angle-down';
 }
 </script>
 
@@ -8,6 +15,7 @@ function toggleDropdown() {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
 
     <div class="filter_container">
+    
         <!-- Search bar -->
         <div class="field has-addons search_bar">
             <div class="control is-expanded">
@@ -19,12 +27,12 @@ function toggleDropdown() {
         </div>
 
         <!-- Genre dropdown -->
-        <div class="dropdown">
+        <div class="dropdown" ref="dropdownRef" :class="{ 'is-active': isOpen }">
             <div class="dropdown-trigger">
                 <button class="button is-primary" aria-haspopup="true" aria-controls="dropdown-menu" @click="toggleDropdown()">
                     <span>Genre</span>
-                    <span class="icon is-small">
-                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                    <span class="icon">
+                        <i :class="['fas', arrow]" aria-hidden="true"></i>
                     </span>
                 </button>
             </div>
