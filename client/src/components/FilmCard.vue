@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import exampleImage from '../assets/photo1.jpg';
+import exampleImage from '../assets/Gallerypics/photo1.jpg';
 
 const router = useRouter();
 
