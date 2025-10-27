@@ -1,20 +1,19 @@
 <template>
 	<section class="section">
 		<div class="container" style="max-width: 500px">
-			
-			<!-- Film information -->
 			<div class="box mb-4">
 				<h1 class="title is-4 has-text-centered">Seat Selection</h1>
 				<h2 class="subtitle title"><strong>Film Title</strong></h2>
 				<p><strong>Date:</strong> 2024-06-15</p>
 				<p><strong>Time:</strong> 19:30</p>
 				<p><strong>Location:</strong> Cinema Hall 1</p>
-				
+
 				<header class="card-header">
 					<h2 class="subtitle title">
 						<strong>Choose seat type and tickets</strong>
 					</h2>
 				</header>
+
 				<div class="card-content">
 					<div class="buttons">
 						<button
@@ -28,6 +27,7 @@
 								alt="Single seat"
 							/>
 						</button>
+
 						<button
 							class="button is-image seat-button"
 							:class="{ 'is-primary': seatType === 'double' }"
@@ -40,16 +40,14 @@
 							/>
 						</button>
 					</div>
+
 					<div class="ticket-section">
 						<div class="ticket-row">
-							<span class="ticket-label"
-								><strong>Number of Tickets:</strong></span
-							>
+							<span class="ticket-label"><strong>Number of Tickets:</strong></span>
 							<div class="field has-addons">
 								<p class="control">
 									<button class="button" @click="decreaseTickets">-</button>
 								</p>
-								<p class="control"></p>
 								<div class="ticket-number-display">
 									{{ tickets }}
 								</div>
@@ -59,7 +57,12 @@
 							</div>
 						</div>
 					</div>
-					<router-link class="button is-primary is-fullwidth" to="seat-selector" @click="buyTickets">
+
+					<router-link
+						class="button is-primary is-fullwidth"
+						to="seat-selector"
+						@click="buyTickets"
+					>
 						Buy Tickets
 					</router-link>
 				</div>
@@ -80,7 +83,7 @@ export default {
 		return {
 			seatType: "single",
 			tickets: 1,
-			isDarkTheme: false,
+			currentTheme: document.documentElement.getAttribute("data-theme") || "light",
 			singleSeatLight,
 			singleSeatDark,
 			doubleSeatLight,
@@ -88,55 +91,34 @@ export default {
 		};
 	},
 
-	// Watch for theme changes for seat images
 	computed: {
 		getSingleSeatImage() {
-			if (this.isDarkTheme) {
-				return this.singleSeatDark;
-			} else {
-				return this.singleSeatLight;
-			}
+			return this.currentTheme === "dark"
+				? this.singleSeatDark
+				: this.singleSeatLight;
 		},
 		getDoubleSeatImage() {
-			if (this.isDarkTheme) {
-				return this.doubleSeatDark;
-			} else {
-				return this.doubleSeatLight;
-			}
+			return this.currentTheme === "dark"
+				? this.doubleSeatDark
+				: this.doubleSeatLight;
 		},
 	},
 
-	// Listen for theme changes
 	mounted() {
-		this.checkTheme();
-		const observer = new MutationObserver(() => this.checkTheme());
-		observer.observe(document.documentElement, {
-			attributes: true,
-			attributeFilter: ["data-theme", "class"],
+		this.observer = new MutationObserver(() => {
+			this.currentTheme = document.documentElement.getAttribute("data-theme") || "light";
 		});
-		this.themeObserver = observer;
+		this.observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ["data-theme"],
+		});
 	},
+
 	beforeUnmount() {
-		if (this.themeObserver) {
-			this.themeObserver.disconnect();
-		}
+		if (this.observer) this.observer.disconnect();
 	},
+
 	methods: {
-		checkTheme() {
-			const htmlElement = document.documentElement;
-			const bodyElement = document.body;
-
-			const isDark =
-				htmlElement.getAttribute("data-theme") === "dark" ||
-				bodyElement.classList.contains("theme-dark") ||
-				bodyElement.classList.contains("dark-theme") ||
-				htmlElement.classList.contains("theme-dark") ||
-				window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-			this.isDarkTheme = isDark;
-		},
-
-		// Ticket logic
 		increaseTickets() {
 			this.tickets++;
 		},
@@ -191,6 +173,6 @@ export default {
 
 .card-header {
 	margin-top: 2rem;
-	margin-bottom: .5rem;
+	margin-bottom: 0.5rem;
 }
 </style>

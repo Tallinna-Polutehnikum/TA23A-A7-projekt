@@ -53,7 +53,7 @@
 import { computed } from 'vue'
 import { ref } from 'vue'
 
-const tickets = 1
+const tickets = 99
 const numRows = 8
 const seatsPerRow = 15
 
@@ -63,14 +63,14 @@ const selectedSeats = ref([])
 function createSeatLayout() {
   const layout = []
   for (let row = 0; row < numRows; row++) {
-    const rowSeats = [] // Creates an array that holds seats for each row
+    const rowSeats = []
     
     for (let seat = 1; seat <= seatsPerRow; seat++) {
       const seatId = `${String.fromCharCode(65 + row)}${seat}`
       rowSeats.push({
         id: seatId,
         number: seat,
-        occupied: false // Math.random() < 0.2
+        occupied: Math.random() < 0.2
       })
     }
     layout.push(rowSeats)
@@ -142,27 +142,52 @@ const seatsRemaining = computed(() => totalSeats.value - selectedSeats.value.len
 .cell {
   width: 2.5rem;
   height: 2.5rem;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
+  color: rgb(0, 0, 0);
+  background: #dfdfdf;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: #4d4d4d;
   cursor: pointer;
   transition: all 0.2s ease;
   border: 2px solid transparent;
 }
 
+@media (prefers-color-scheme: dark) {
+  .cell {
+    color: rgb(229, 229, 229);
+    background: #535353;
+    border: 2px solid #ffffff31;
+  }
+}
+
+:root[data-theme="dark"] .cell,
+[data-theme="dark"] .cell {
+  color: rgb(229, 229, 229);
+  background-color: #535353;
+}
+
+:root[data-theme="light"] .cell,
+[data-theme="light"] .cell {
+  color: rgb(0, 0, 0);
+  background-color: #dfdfdf;
+}
+
+.cell:hover {
+  border: 2px solid #00d1b2b4;
+}
+
 .cell.is-selected {
   background-color: hsl(171, 100%, 41%);
   color: #000000;
-  border: 2px solid #00d1b2;
+  border: 3px solid #00d1b2;
 }
 
+
 .cell.is-occupied {
-  background-color: #e74c3c;
   color: #fff;
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.25;
 }
-</style>
+</style> 
