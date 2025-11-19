@@ -211,7 +211,7 @@ const filteredShowtimes = computed(() => {
 .cinema-img { width: 100%; height: auto; }
 .trailer-film-columns { display: flex; gap: 40px; margin: 40px auto; max-width: 1200px; }
 .trailer-box, .film-info-box { flex: 1; padding: 15px; box-sizing: border-box; }
-.film-info-box { line-height: 1.9; }
+.film-info-box { line-height: 1.9; height: 20rem; margin-top: 7.1%; }
 .trailer-box iframe { width: 100%; height: 400px; }
 .full-width-btn { width: 100%; margin-top: 20px; }
 .gallery-btn-container {
@@ -294,7 +294,7 @@ const filteredShowtimes = computed(() => {
 }
 
 
-.description-section { display: flex; align-items: flex-start; margin-left: 50px; margin-top: 200px; gap: 50px; flex-wrap: wrap; }
+.description-section { display: flex; align-items: flex-start; margin-left: 50px; margin-top: 30px; gap: 50px; flex-wrap: wrap; }
 .description-text { max-width: 600px; font-family: Arial, sans-serif; line-height: 1.8; }
 .photo-box { padding: 10px; }
 .photo-right {
@@ -303,7 +303,7 @@ const filteredShowtimes = computed(() => {
   max-height: 600px;   /* maksimaalne kõrgus */
   object-fit: contain;  /* kogu pilt kasti sisse */
 }
-.showtimes-section { margin: 50px auto; max-width: 800px; text-align: center; }
+.showtimes-section { margin: 30px auto; max-width: 800px; text-align: center; }
 .showtime-box { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
 @media screen and (max-width: 768px) {
   .trailer-film-columns { flex-direction: column; align-items: center; }
