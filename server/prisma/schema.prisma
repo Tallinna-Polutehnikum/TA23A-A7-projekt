@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model booking_seats {
+  booking_id Int
+  seat_id    Int
+  bookings   bookings @relation(fields: [booking_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "booking_seats_ibfk_1")
+  seats      seats    @relation(fields: [seat_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "booking_seats_ibfk_2")
+
+  @@id([booking_id, seat_id])
+  @@index([seat_id], map: "seat_id")
+}
+
+model bookings {
+  id                Int             @id @default(autoincrement())
+  showtime_id       Int
+  number_of_tickets Int
+  booking_seats     booking_seats[]
+  showtimes         showtimes       @relation(fields: [showtime_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "bookings_ibfk_1")
+
+  @@index([showtime_id], map: "showtime_id")
+}
+
+model gallery {
+  id            Int             @id @default(autoincrement())
+  gallery_image Bytes           @db.MediumBlob
+  image_gallery image_gallery[]
+}
+
+model image_gallery {
+  image_id   Int
+  gallery_id Int
+  images     images  @relation(fields: [image_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "image_gallery_ibfk_1")
+  gallery    gallery @relation(fields: [gallery_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "image_gallery_ibfk_2")
+
+  @@id([image_id, gallery_id])
+  @@index([gallery_id], map: "gallery_id")
+}
+
+model images {
+  id                Int             @id @default(autoincrement())
+  film_cover        Bytes           @db.MediumBlob
+  film_header_image Bytes           @db.MediumBlob
+  movie_id          Int
+  image_gallery     image_gallery[]
+  movies            movies          @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "images_ibfk_1")
+
+  @@index([movie_id], map: "movie_id")
+}
+
+model movies {
+  id          Int         @id @default(autoincrement())
+  title       String      @db.VarChar(255)
+  genre       String      @db.VarChar(255)
+  duration    Int
+  age_rating  String      @db.VarChar(10)
+  director    String      @db.VarChar(255)
+  cast        String      @db.Text
+  trailer_url String      @db.Text
+  description String      @db.Text
+  images      images[]
+  showtimes   showtimes[]
+}
+
+model seats {
+  id             Int              @id @default(autoincrement())
+  showtime_id    Int
+  seat_number    String           @db.VarChar(10)
+  seat_type      seats_seat_type? @default(single)
+  seat_available Boolean?         @default(true)
+  booking_seats  booking_seats[]
+  showtimes      showtimes        @relation(fields: [showtime_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "seats_ibfk_1")
+
+  @@index([showtime_id], map: "showtime_id")
+}
+
+model showtimes {
+  id        Int        @id @default(autoincrement())
+  movie_id  Int
+  show_date DateTime   @db.Date
+  show_time DateTime   @db.Time(0)
+  location  String     @db.VarChar(255)
+  bookings  bookings[]
+  seats     seats[]
+  movies    movies     @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "showtimes_ibfk_1")
+
+  @@index([movie_id], map: "movie_id")
+}
+
+enum seats_seat_type {
+  single
+  double
+}
