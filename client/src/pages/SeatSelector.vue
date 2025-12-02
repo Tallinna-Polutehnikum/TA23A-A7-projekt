@@ -37,11 +37,15 @@
 				<p><strong>Time:</strong> 19:30</p>
 				<p><strong>Location:</strong> Cinema Hall 1</p>
 				<p><strong>Seats:</strong> Single</p>
-				<p><strong>Tickets:</strong> {{ tickets }}</p>
-
-				<h2 class="Seats subtitle "><strong>Available seats: {{ seatsRemaining }}</strong></h2>
-
-                <button class="button is-primary">Proceed to payment</button>
+				<h2 class="subtitle mt-4 mb-1"><strong>Tickets left: {{ seatsRemaining }}</strong></h2>
+        
+        <button 
+          class="button is-primary" 
+          @click="$router.push('/email-verification')"
+          :disabled="selectedSeats.length !== tickets"
+        >
+          Proceed to payment
+        </button>
             </aside>
         </div>
       </div>
@@ -53,7 +57,7 @@
 import { computed } from 'vue'
 import { ref } from 'vue'
 
-const tickets = 99
+const tickets = parseInt(new URLSearchParams(window.location.search).get('tickets')) || 1 // Gets the tickets from seats page
 const numRows = 8
 const seatsPerRow = 15
 
@@ -98,8 +102,7 @@ function toggleSeatSelection(seatId) {
   }
 }
 
-const totalSeats = computed(() => seatLayout.value.flat().filter(seat => !seat.occupied).length)
-const seatsRemaining = computed(() => totalSeats.value - selectedSeats.value.length)
+const seatsRemaining = computed(() => tickets - selectedSeats.value.length)
 
 </script>
 
