@@ -58,13 +58,12 @@
 						</div>
 					</div>
 
-					<router-link
+					<button
 						class="button is-primary is-fullwidth"
-						to="seat-selector"
-						@click="buyTickets"
+						@click="$router.push({ path: '/seat-selector', query: { tickets: tickets } })"
 					>
 						Buy Tickets
-					</router-link>
+					</button>
 				</div>
 			</div>
 		</div>
