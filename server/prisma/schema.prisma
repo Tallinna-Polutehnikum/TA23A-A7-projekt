@@ -28,28 +28,21 @@ model bookings {
 }
 
 model gallery {
-  id            Int             @id @default(autoincrement())
-  gallery_image Bytes           @db.MediumBlob
-  image_gallery image_gallery[]
-}
+  id       Int     @id @default(autoincrement())
+  image_id Int
+  image    String? @db.VarChar(255)
+  images   images  @relation(fields: [image_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "gallery_ibfk_1")
 
-model image_gallery {
-  image_id   Int
-  gallery_id Int
-  images     images  @relation(fields: [image_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "image_gallery_ibfk_1")
-  gallery    gallery @relation(fields: [gallery_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "image_gallery_ibfk_2")
-
-  @@id([image_id, gallery_id])
-  @@index([gallery_id], map: "gallery_id")
+  @@index([image_id], map: "image_id")
 }
 
 model images {
-  id                Int             @id @default(autoincrement())
-  film_cover        Bytes           @db.MediumBlob
-  film_header_image Bytes           @db.MediumBlob
+  id                Int       @id @default(autoincrement())
   movie_id          Int
-  image_gallery     image_gallery[]
-  movies            movies          @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "images_ibfk_1")
+  film_cover        String    @db.VarChar(255)
+  film_header_image String    @db.VarChar(255)
+  gallery           gallery[]
+  movies            movies    @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "images_ibfk_1")
 
   @@index([movie_id], map: "movie_id")
 }

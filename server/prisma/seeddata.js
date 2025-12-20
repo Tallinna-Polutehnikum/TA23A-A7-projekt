@@ -21,7 +21,8 @@ const images = [
 
 const gallery = [
     {
-        gallery_image: "",
+        image_id: 1,
+        image: "",
     }
 ];
 
@@ -57,11 +58,4 @@ const booking_seats = [
     }
 ];
 
-const image_gallery = [
-    {
-        image_id: 1,
-        gallery_id: 1,
-    }
-];
-
-export default { movies, images, gallery, showtimes, bookings, seats, booking_seats, image_gallery }
+export default { movies, images, gallery, showtimes, bookings, seats, booking_seats }
