@@ -1,45 +1,53 @@
-# Cinema-project-TA-23A
+# TA23A-A7-projekt
 Clone repository:
 ```bash
 git clone https://github.com/Tallinna-Polutehnikum/TA23A-A7-projekt.git
 ```
-## Frontend & backend
-Change directory either to server or client:
+## How to setup front-end dev environment
 ```bash
 cd client
 ```
-```bash
-cd server
-```
-Install required node modules:
+Install required packages:
 ```bash
 npm i
 ```
-Run live server:
+Run localhost server:
 ```bash
 npm run dev
 ```
-## Database
-Open MySQL and create an user if haven't already, set the username as **root** and the password as **mysql**, make sure the port is **3306** <br>
-Go to server directory and create a file **.env** and copy contents from **.env.example** file to it. <br>
+## How to setup back-end & database dev environment
+```bash
+cd server
+```
+Install required packages:
+```bash
+npm i
+```
+Open mysql workbench and create a new sql connection. Put the username as **root** and password as **mysql**, make sure you use port **3306**. <br>
+Also inside server/ directory create a **.env** file and paste there content from **.env.example**. <br>
 <br>
-If you have created a schema in MySQL then you can skip to the push part, if you haven't then do so:
+Make a new sql file in mysql workbench and create a database:
 ```bash
 CREATE DATABASE cinema;
 ```
-```bash
-USE cinema;
-```
-Push the prisma schema into MySQL:
+Push the schema into mysql:
 ```bash
 npx prisma db push
 ```
-Generate Prisma Client:
+Generate prisma client:
 ```bash
 npx prisma generate
 ```
-### Some other useful commands for development
-After changing the schema.prisma create a migration (basically acts as git):
+Seed the database:
+```bash
+npm run seed
+```
+Run localhost server:
+```bash
+npm run dev
+```
+## Some other useful commands for development
+After changing schema.prisma create a migration:
 ```bash
 npx prisma migrate dev --name descriptive_name
 ```
