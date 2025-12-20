@@ -47,8 +47,8 @@ async function main() {
         showtimeIds.push(created.id);
     }
 
-    const baseSeats = seeddata.seats;
     for (const stId of showtimeIds) {
+        const baseSeats = seeddata.generateSeats();
         const seatsToCreate = baseSeats.map((s) => ({
             showtime_id: stId,
             seat_number: s.seat_number,
