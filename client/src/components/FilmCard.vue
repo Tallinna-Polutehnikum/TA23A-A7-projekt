@@ -1,28 +1,35 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import exampleImage from '../assets/Gallerypics/photo1.jpg';
+
+// Accept movie as prop
+defineProps({
+  movie: {
+    type: Object,
+    required: true
+  }
+});
 
 const router = useRouter();
 
-function goToMovies() {
-    router.push('/movies');
-}
+const goToMovies = () => {
+  router.push(`/movies/${movie.id}`);
+};
 </script>
 
 <template>
-    <div class="card" @click="goToMovies">
-        <div class="card-image">
-            <img :src="exampleImage" alt="example image" />
-        </div>
-        <div class="card-content">
-            <p class="title is-4">Title</p>
-            <p class="subtitle is-6">Genre</p>
-        </div>
+  <div class="card" @click="goToMovies">
+    <div class="card-image">
+      <img :src="movie.images[0]?.film_cover" alt="Movie cover" />
     </div>
+    <div class="card-content">
+      <p class="title is-4">{{ movie.title }}</p>
+      <p class="subtitle is-6">{{ movie.genre }}</p>
+    </div>
+  </div>
 </template>
 
 <style scoped>
 .card:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 </style>

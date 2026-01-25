@@ -1,90 +1,77 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, defineProps, defineEmits } from 'vue';
+
+const props = defineProps({
+  genres: Array,
+  search: String,
+  genre: String
+});
+const emit = defineEmits(['update:search', 'update:genre']);
 
 const isOpen = ref(false);
-
 const arrow = ref('fa-angle-down');
 
 function toggleDropdown() {
-    isOpen.value = !isOpen.value;
-    arrow.value = isOpen.value ? 'fa-angle-up' : 'fa-angle-down';
+  isOpen.value = !isOpen.value;
+  arrow.value = isOpen.value ? 'fa-angle-up' : 'fa-angle-down';
+}
+
+function selectGenre(g) {
+  emit('update:genre', g);
+  isOpen.value = false;
+  arrow.value = 'fa-angle-down';
+}
+
+function updateSearch(e) {
+  emit('update:search', e.target.value);
 }
 </script>
 
 <template>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
-
-    <div class="filter_container">
-    
-        <!-- Search bar -->
-        <div class="field has-addons search_bar">
-            <div class="control is-expanded">
-                <input class="input is-normal" type="text" placeholder="Insert film name" />
-            </div>
-            <div class="control">
-                <button class="button is-primary">Search</button>
-            </div>
-        </div>
-
-        <!-- Genre dropdown -->
-        <div class="dropdown" ref="dropdownRef" :class="{ 'is-active': isOpen }">
-            <div class="dropdown-trigger">
-                <button class="button is-primary" aria-haspopup="true" aria-controls="dropdown-menu" @click="toggleDropdown()">
-                    <span>Genre</span>
-                    <span class="icon">
-                        <i :class="['fas', arrow]" aria-hidden="true"></i>
-                    </span>
-                </button>
-            </div>
-            <div class="dropdown-menu" id="dropdown-menu" role="menu">
-                <div class="dropdown-content">
-                    <button class="dropdown-item">Animation</button>
-                    <button class="dropdown-item">Anime</button>
-                    <button class="dropdown-item">Ballet</button>
-                    <button class="dropdown-item">Documentary</button>
-                    <button class="dropdown-item">Drama</button>
-                    <button class="dropdown-item">Fantasy</button>
-                    <button class="dropdown-item">Family</button>
-                    <button class="dropdown-item">Comedy</button>
-                    <button class="dropdown-item">Concert</button>
-                    <button class="dropdown-item">Crime</button>
-                    <button class="dropdown-item">Action</button>
-                    <button class="dropdown-item">Black humor</button>
-                    <button class="dropdown-item">Mystery</button>
-                    <button class="dropdown-item">Music</button>
-                    <button class="dropdown-item">Musical</button>
-                    <button class="dropdown-item">Doll movie</button>
-                    <button class="dropdown-item">Opera</button>
-                    <button class="dropdown-item">Horror</button>
-                    <button class="dropdown-item">Adventure</button>
-                    <button class="dropdown-item">Romance</button>
-                    <button class="dropdown-item">Sport</button>
-                    <button class="dropdown-item">Theater</button>
-                    <button class="dropdown-item">Thiller</button>
-                    <button class="dropdown-item">Ci-Fi</button>
-                </div>
-            </div>
-        </div>
+  <div class="filter_container">
+    <!-- Search bar -->
+    <div class="field has-addons search_bar">
+      <div class="control is-expanded">
+        <input class="input is-normal" type="text" placeholder="Insert film name" :value="search" @input="updateSearch"/>
+      </div>
+      <div class="control">
+        <button class="button is-primary" @click="$emit('update:search', search)">Search</button>
+      </div>
     </div>
+<!-- Genre dropdown -->
+<div class="dropdown" :class="{ 'is-active': isOpen }">
+  <div class="dropdown-trigger">
+    <button class="button is-primary" @click="toggleDropdown">
+      <span>Genres</span> <!-- always show "Genres" -->
+      <span class="icon">
+        <i :class="['fas', arrow]" aria-hidden="true"></i>
+      </span>
+    </button>
+  </div>
+  <div class="dropdown-menu">
+    <div class="dropdown-content">
+      <button class="dropdown-item" v-for="g in genres" :key="g" @click="selectGenre(g)">{{ g }}</button>
+    </div>
+  </div>
+ </div>
+</div>
+
 </template>
 
 <style scoped>
 .filter_container {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center; /* vertically center search bar + dropdown */
 }
 
 .search_bar {
-    max-width: 100%;
-    flex: 1;
+  flex: 1; /* take all available space */
 }
 
 .dropdown {
-    height: 50px;
+  flex: 0 0 auto; /* don’t grow, keep natural width */
+  height: 50px;
 }
 
-.dropdown-menu {
-    max-height: 400px;
-    overflow-y: auto;
-}
 </style>
