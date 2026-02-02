@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-const homePageMovies = async (req, res, next) => {
+const getMovies = async (req, res, next) => {
   try {
     const movies = await prisma.movies.findMany({
       include: {
@@ -26,4 +26,4 @@ const homePageMovies = async (req, res, next) => {
   }
 };
 
-export default homePageMovies;
+export default getMovies;
