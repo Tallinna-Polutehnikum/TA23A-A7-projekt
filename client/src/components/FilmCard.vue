@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router';
 
 // Accept movie as prop
-defineProps({
+const props = defineProps({
   movie: {
     type: Object,
     required: true
@@ -12,7 +12,7 @@ defineProps({
 const router = useRouter();
 
 const goToMovies = () => {
-  router.push(`/movies/${movie.id}`);
+  router.push(`/movies/${props.movie.id}`);
 };
 </script>
 

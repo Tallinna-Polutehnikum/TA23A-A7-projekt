@@ -12,6 +12,7 @@ const router = createRouter({
 	routes: [
 		{ path: "/", component: Home },
 		{ path: "/movies", component: Movies },
+		{ path: "/movies/:id", component: Movies },
 		{ path: "/seats", component: Seats },
 		{ path: "/seat-selector", component: SeatSelector },
 		{ path: "/email-verification", component: EmailVerification },

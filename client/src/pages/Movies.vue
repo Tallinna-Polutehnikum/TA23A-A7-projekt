@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
@@ -34,7 +34,7 @@ const fetchMovie = async () => {
 
     // If no ID, fetch all movies and pick first
     if (!id) {
-      const resAll = await fetch("/home"); // route that returns all movies
+      const resAll = await fetch("http://localhost:5000/home"); // route that returns all movies
       if (!resAll.ok) throw new Error("Failed to fetch movies");
       const allMovies = await resAll.json();
       if (!allMovies.length) return;
@@ -63,6 +63,11 @@ const fetchMovie = async () => {
 };
 
 onMounted(fetchMovie);
+
+// Watch for route changes
+watch(() => route.params.id, () => {
+  fetchMovie();
+});
 
 // Filtered showtimes
 const filteredShowtimes = computed(() => {
