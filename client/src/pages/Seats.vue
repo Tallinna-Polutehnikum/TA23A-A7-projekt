@@ -3,11 +3,10 @@
 		<div class="container" style="max-width: 500px">
 			<div class="box mb-4">
 				<h1 class="title is-4 has-text-centered">Seat Selection</h1>
-				<h2 class="subtitle title"><strong>Film Title</strong></h2>
-				<p><strong>Date:</strong> 2024-06-15</p>
-				<p><strong>Time:</strong> 19:30</p>
-				<p><strong>Location:</strong> Cinema Hall 1</p>
-
+			<h2 class="subtitle title"><strong>{{ movieTitle }}</strong></h2>
+			<p><strong>Date:</strong> {{ formatDate(showtimeDate) }}</p>
+			<p><strong>Time:</strong> {{ formatTime(showtimeTime) }}</p>
+			<p><strong>Location:</strong> {{ location }}</p>
 				<header class="card-header">
 					<h2 class="subtitle title">
 						<strong>Choose seat type and tickets</strong>
@@ -87,6 +86,11 @@ export default {
 			singleSeatDark,
 			doubleSeatLight,
 			doubleSeatDark,
+			movieTitle: "",
+			showtimeDate: null,
+			showtimeTime: null,
+			location: "",
+			movieId: null,
 		};
 	},
 
@@ -103,7 +107,7 @@ export default {
 		},
 	},
 
-	mounted() {
+	async mounted() {
 		this.observer = new MutationObserver(() => {
 			this.currentTheme = document.documentElement.getAttribute("data-theme") || "light";
 		});
@@ -111,6 +115,8 @@ export default {
 			attributes: true,
 			attributeFilter: ["data-theme"],
 		});
+
+		await this.fetchShowtimeData();
 	},
 
 	beforeUnmount() {
@@ -118,6 +124,36 @@ export default {
 	},
 
 	methods: {
+		async fetchShowtimeData() {
+			try {
+				const showtimeId = this.$route.params.showtimeId;
+				
+				const showtimeResponse = await fetch(`http://localhost:5000/showtimes/${showtimeId}`);
+				const showtime = await showtimeResponse.json();
+				
+				this.showtimeDate = showtime.show_date;
+				this.showtimeTime = showtime.show_time;
+				this.location = showtime.location;
+				this.movieId = showtime.movie_id;
+				
+				const movieResponse = await fetch(`http://localhost:5000/movies/${showtime.movie_id}`);
+				const movie = await movieResponse.json();
+				
+				this.movieTitle = movie.title;
+			} catch (error) {
+				console.error("Error fetching showtime data:", error);
+			}
+		},
+		formatDate(dateString) {
+			if (!dateString) return "";
+			const date = new Date(dateString);
+			return date.toLocaleDateString('en-GB');
+		},
+		formatTime(timeString) {
+			if (!timeString) return "";
+			const time = new Date(timeString);
+			return time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+		},
 		increaseTickets() {
 			this.tickets++;
 		},

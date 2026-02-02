@@ -3,6 +3,7 @@ import { Router } from "express";
 // importige enda controller
 import homePageMovies from "./controllers/homePageMovies.js";
 import { getMovieById } from "./controllers/movieController.js";
+import { getShowtimeById } from "./controllers/showtimeController.js";
 
 
 const router = Router();
@@ -10,6 +11,7 @@ const router = Router();
 // tehke route oma controllerile
 router.get("/home", homePageMovies);
 router.get("/movies/:id", getMovieById);
+router.get("/showtimes/:id", getShowtimeById);
 
 
 
