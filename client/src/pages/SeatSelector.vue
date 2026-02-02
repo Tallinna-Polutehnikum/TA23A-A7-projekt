@@ -32,11 +32,11 @@
 
         <div class="column is-one-quarter">
           <aside class="box infobox">
-				<h2 class="subtitle"><strong>Film Title</strong></h2>
-				<p><strong>Date:</strong> 2024-06-15</p>
-				<p><strong>Time:</strong> 19:30</p>
-				<p><strong>Location:</strong> Cinema Hall 1</p>
-				<p><strong>Seats:</strong> Single</p>
+				<h2 class="subtitle"><strong>{{ movieTitle }}</strong></h2>
+				<p><strong>Date:</strong> {{ formatDate(showtimeDate) }}</p>
+				<p><strong>Time:</strong> {{ formatTime(showtimeTime) }}</p>
+				<p><strong>Location:</strong> {{ location }}</p>
+				<p><strong>Seats:</strong> {{ seatType }}</p>
 				<h2 class="subtitle mt-4 mb-1"><strong>Tickets left: {{ seatsRemaining }}</strong></h2>
         
         <button 
@@ -54,15 +54,22 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
-const tickets = parseInt(new URLSearchParams(window.location.search).get('tickets')) || 1 // Gets the tickets from seats page
+const route = useRoute()
+const tickets = parseInt(route.query.tickets) || 1
+const showtimeId = route.query.id
 const numRows = 8
 const seatsPerRow = 15
 
 const seatLayout = ref([])
 const selectedSeats = ref([])
+const movieTitle = ref('')
+const showtimeDate = ref(null)
+const showtimeTime = ref(null)
+const location = ref('')
+const seatType = ref('Single')
 
 function createSeatLayout() {
   const layout = []
@@ -102,7 +109,43 @@ function toggleSeatSelection(seatId) {
   }
 }
 
+async function fetchShowtimeData() {
+  if (!showtimeId) return
+  
+  try {
+    const showtimeResponse = await fetch(`http://localhost:5000/showtimes/${showtimeId}`)
+    const showtime = await showtimeResponse.json()
+    
+    showtimeDate.value = showtime.show_date
+    showtimeTime.value = showtime.show_time
+    location.value = showtime.location
+    
+    const movieResponse = await fetch(`http://localhost:5000/movies/${showtime.movie_id}`)
+    const movie = await movieResponse.json()
+    
+    movieTitle.value = movie.title
+  } catch (error) {
+    console.error('Error fetching showtime data:', error)
+  }
+}
+
+function formatDate(dateString) {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-GB')
+}
+
+function formatTime(timeString) {
+  if (!timeString) return ''
+  const time = new Date(timeString)
+  return time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+}
+
 const seatsRemaining = computed(() => tickets - selectedSeats.value.length)
+
+onMounted(() => {
+  fetchShowtimeData()
+})
 
 </script>
 
@@ -187,10 +230,9 @@ const seatsRemaining = computed(() => tickets - selectedSeats.value.length)
   border: 3px solid #00d1b2;
 }
 
-
 .cell.is-occupied {
   color: #fff;
   cursor: not-allowed;
   opacity: 0.25;
 }
-</style> 
+</style>

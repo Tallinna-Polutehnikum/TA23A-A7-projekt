@@ -59,7 +59,7 @@
 
 					<button
 						class="button is-primary is-fullwidth"
-						@click="$router.push({ path: '/seat-selector', query: { tickets: tickets } })"
+						@click="$router.push({ path: '/seat-selector', query: { id: showtimeId, tickets: tickets, seatType: seatType } })"
 					>
 						Buy Tickets
 					</button>
@@ -91,6 +91,7 @@ export default {
 			showtimeTime: null,
 			location: "",
 			movieId: null,
+			showtimeId: this.$route.query.id,
 		};
 	},
 
@@ -126,7 +127,7 @@ export default {
 	methods: {
 		async fetchShowtimeData() {
 			try {
-				const showtimeId = this.$route.params.showtimeId;
+				const showtimeId = this.$route.query.id;
 				
 				const showtimeResponse = await fetch(`http://localhost:5000/showtimes/${showtimeId}`);
 				const showtime = await showtimeResponse.json();
@@ -159,10 +160,6 @@ export default {
 		},
 		decreaseTickets() {
 			if (this.tickets > 1) this.tickets--;
-		},
-		buyTickets() {
-			console.log("Seat type:", this.seatType);
-			console.log("Tickets:", this.tickets);
 		},
 	},
 };
