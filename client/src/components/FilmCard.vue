@@ -19,7 +19,7 @@ const goToMovies = () => {
 <template>
   <div class="card" @click="goToMovies">
     <div class="card-image">
-      <img :src="movie.images[0]?.film_cover" alt="Movie cover" />
+      <img :src="`http://localhost:5000/${movie.images[0]?.film_cover}`" alt="Movie cover" />
     </div>
     <div class="card-content">
       <p class="title is-4">{{ movie.title }}</p>

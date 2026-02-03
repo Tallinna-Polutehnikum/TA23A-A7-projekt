@@ -14,14 +14,7 @@ export const getMovieInfo = async (req, res, next) => {
     });
 
     if (!movie) return res.status(404).json({ message: "Movie not found" });
-
-    // prepend URL
-    movie.images = movie.images.map(img => ({
-      ...img,
-      film_cover: `http://localhost:5000/images/${img.film_cover}`,
-      film_header_image: `http://localhost:5000/images/${img.film_header_image}`
-    }));
-
+    
     res.json(movie);
   } catch (err) {
     next(err);

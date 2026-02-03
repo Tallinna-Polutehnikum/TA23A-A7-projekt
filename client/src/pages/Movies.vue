@@ -100,7 +100,7 @@ const goToSeats = () => { router.push("/seats"); };
   <div v-if="movieData">
     <!-- Main header image -->
     <div class="box cinema-img-box">
-      <img :src="movieData.images[0]?.film_header_image" alt="Cinema" class="cinema-img" />
+      <img :src="`http://localhost:5000/${movieData.images[0]?.film_header_image}`" alt="Cinema" class="cinema-img" />
     </div>
 
     <!-- Trailer + Film info -->
@@ -145,7 +145,7 @@ const goToSeats = () => { router.push("/seats"); };
         <p v-for="(desc, index) in movieData.description.split('. ')" :key="index">{{ desc }}.</p>
       </div>
       <div class="box photo-box">
-        <img :src="movieData.images[0]?.film_cover" alt="Photo" class="photo-right" />
+        <img :src="`http://localhost:5000/${movieData.images[0]?.film_cover}`" alt="Photo" class="photo-right" />
       </div>
     </div>
 

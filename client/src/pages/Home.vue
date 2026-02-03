@@ -16,7 +16,7 @@ const genres = ref([
 
 // Pagination
 const currentPage = ref(1);
-const moviesPerPage = 6; // adjust
+const moviesPerPage = 12; // adjust
 const paginatedMovies = ref([]);
 
 // Fetch all movies
