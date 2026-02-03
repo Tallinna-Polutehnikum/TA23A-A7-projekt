@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export const getMovieById = async (req, res, next) => {
+export const getMovieInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
 

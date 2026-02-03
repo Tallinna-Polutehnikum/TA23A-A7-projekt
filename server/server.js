@@ -4,13 +4,13 @@ import cors from "cors";
 import errorHandler from "./src/middleware/errorHandler.js";
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 app.use(express.json());
 
 app.use(cors());
 
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 app.use("/", router);
 
