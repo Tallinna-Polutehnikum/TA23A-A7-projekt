@@ -125,22 +125,64 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const selectedMethod = ref('')
 const processing = ref(false)
 const cardDetails = ref({ number: '', name: '', expiry: '', cvv: '' })
 const cardError = ref({ number: '', name: '', expiry: '', cvv: '' })
 
 const bookingDetails = ref({
-  movie: 'Film Title',
-  date: '2024-06-15',
-  time: '19:30',
-  seats: 'A1, A2, A3',
-  ticketCount: 3
+  movie: '',
+  date: '',
+  time: '',
+  location: '',
+  seats: '',
+  ticketCount: 0
 })
 
-const totalAmount = computed(() => (bookingDetails.value.ticketCount * 12.50).toFixed(2))
+function formatDate(dateString) {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-GB')
+}
+
+function formatTime(timeString) {
+  if (!timeString) return ''
+  const time = new Date(timeString)
+  return time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+}
+
+async function fetchShowtimeData() {
+  try {
+    const showtimeId = route.query.id
+    
+    const showtimeResponse = await fetch(`http://localhost:5000/showtimes/${showtimeId}`)
+    const showtime = await showtimeResponse.json()
+    
+    const movieResponse = await fetch(`http://localhost:5000/movies/${showtime.movie_id}`)
+    const movie = await movieResponse.json()
+    
+    bookingDetails.value = {
+      movie: movie.title,
+      date: formatDate(showtime.show_date),
+      time: formatTime(showtime.show_time),
+      location: showtime.location,
+      seats: route.query.seats || '',
+      ticketCount: parseInt(route.query.tickets) || 0
+    }
+  } catch (error) {
+    console.error('Error fetching showtime data:', error)
+  }
+}
+
+onMounted(() => {
+  fetchShowtimeData()
+})
+
+const totalAmount = computed(() => (bookingDetails.value.ticketCount * 8.54).toFixed(2))
 
 function selectMethod(method) {
   selectedMethod.value = method
