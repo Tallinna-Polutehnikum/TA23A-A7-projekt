@@ -1,7 +1,25 @@
 <template>
 	<section class="section">
 		<div class="container" style="max-width: 500px">
-			<div class="box mb-4">
+
+			<div v-if="!showtimeId" class="box has-text-centered">
+				<h1 class="title is-2 has-text-danger">Error</h1>
+				<p class="subtitle">Showtime id missing</p>
+				<button class="button is-primary" @click="$router.push('/movies')">
+					Go to Movies
+				</button>
+			</div>
+
+			<div v-else-if="error" class="box has-text-centered">
+				<h1 class="title is-2 has-text-danger">Error</h1>
+				<p class="subtitle">{{ error }}</p>
+				<button class="button is-primary" @click="$router.push('/movies')">
+					Go to Movies
+				</button>
+			</div>
+
+			<!-- Main Content -->
+			<div v-else-if="!error" class="box mb-4">
 				<h1 class="title is-4 has-text-centered">Seat Selection</h1>
 			<h2 class="subtitle title"><strong>{{ movieTitle }}</strong></h2>
 			<p><strong>Date:</strong> {{ formatDate(showtimeDate) }}</p>
@@ -44,6 +62,7 @@
 						<div class="ticket-row">
 							<span class="ticket-label"><strong>Number of Tickets:</strong></span>
 							<div class="field has-addons">
+								<span class="ticket-number-display"><strong>{{ (ticketPrice * tickets).toFixed(2) }}€</strong></span>
 								<p class="control">
 									<button class="button" @click="decreaseTickets">-</button>
 								</p>
@@ -81,6 +100,8 @@ export default {
 		return {
 			seatType: "single",
 			tickets: 1,
+			ticketPrice: 8.54,
+
 			currentTheme: document.documentElement.getAttribute("data-theme") || "light",
 			singleSeatLight,
 			singleSeatDark,
@@ -92,6 +113,8 @@ export default {
 			location: "",
 			movieId: null,
 			showtimeId: this.$route.query.id,
+			loading: false,
+			error: null,
 		};
 	},
 
@@ -117,7 +140,9 @@ export default {
 			attributeFilter: ["data-theme"],
 		});
 
-		await this.fetchShowtimeData();
+		if (this.showtimeId) {
+			await this.fetchShowtimeData();
+		}
 	},
 
 	beforeUnmount() {
@@ -126,11 +151,25 @@ export default {
 
 	methods: {
 		async fetchShowtimeData() {
+			this.loading = true;
+			this.error = null;
+			
 			try {
 				const showtimeId = this.$route.query.id;
 				
 				const showtimeResponse = await fetch(`http://localhost:5000/showtimes/${showtimeId}`);
+				
+				if (!showtimeResponse.ok) {
+					this.error = "Showtime not found";
+					return;
+				}
+				
 				const showtime = await showtimeResponse.json();
+				
+				if (!showtime || !showtime.movie_id) {
+					this.error = "Invalid showtime data";
+					return;
+				}
 				
 				this.showtimeDate = showtime.show_date;
 				this.showtimeTime = showtime.show_time;
@@ -138,11 +177,25 @@ export default {
 				this.movieId = showtime.movie_id;
 				
 				const movieResponse = await fetch(`http://localhost:5000/movies/${showtime.movie_id}`);
+				
+				if (!movieResponse.ok) {
+					this.error = "Movie information not found";
+					return;
+				}
+				
 				const movie = await movieResponse.json();
+				
+				if (!movie || !movie.title) {
+					this.error = "Movie title missing";
+					return;
+				}
 				
 				this.movieTitle = movie.title;
 			} catch (error) {
 				console.error("Error fetching showtime data:", error);
+				this.error = "Failed to load showtime information";
+			} finally {
+				this.loading = false;
 			}
 		},
 		formatDate(dateString) {
@@ -156,7 +209,7 @@ export default {
 			return time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 		},
 		increaseTickets() {
-			this.tickets++;
+			if (this.tickets < 10) this.tickets++;
 		},
 		decreaseTickets() {
 			if (this.tickets > 1) this.tickets--;

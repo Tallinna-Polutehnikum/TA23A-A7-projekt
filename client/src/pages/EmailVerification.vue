@@ -5,7 +5,7 @@
         <div class="column is-half">
           <div class="box">
             <h1 class="title has-text-centered">Confirmation email  </h1>
-            <h2 class="subtitle has-text-centered">Please enter an email address where we can send a purchase confirmation.</h2>
+            <h2 class="subtitle has-text-centered">Please enter an email address where we can send the purchase confirmation.</h2>
             
             <div class="field">
               <label class="label">Email Address</label>
@@ -40,9 +40,10 @@
 <script setup>
 
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 const email = ref('')
 const emailError = ref('')
 
@@ -52,7 +53,16 @@ function submitEmail() {
   if (!emailRegex.test(email.value)) {
     emailError.value = 'Please enter a valid email address'
   } else {
-    router.push({ path: '/payment', query: { email: email.value } })
+    router.push({ 
+      path: '/payment', 
+      query: {
+        email: email.value,
+        id: route.query.id,
+        tickets: route.query.tickets,
+        seatType: route.query.seatType,
+        seats: route.query.seats,
+      } 
+    })
   }
 }
 </script>
