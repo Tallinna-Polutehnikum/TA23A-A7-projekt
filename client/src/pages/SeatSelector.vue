@@ -41,7 +41,7 @@
         
         <button 
           class="button is-primary" 
-          @click="$router.push('/email-verification')"
+          @click="proceedToPayment"
           :disabled="selectedSeats.length !== tickets"
         >
           Proceed to payment
@@ -55,9 +55,10 @@
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const $router = useRouter()
 const tickets = parseInt(route.query.tickets) || 1
 const showtimeId = route.query.id
 const numRows = 8
@@ -142,6 +143,18 @@ function formatTime(timeString) {
 }
 
 const seatsRemaining = computed(() => tickets - selectedSeats.value.length)
+
+function proceedToPayment() {
+  $router.push({
+    path: '/email-verification',
+    query: {
+      id: showtimeId,
+      tickets: tickets,
+      seatType: seatType.value,
+      seats: selectedSeats.value.join(','),
+    }
+  })
+}
 
 onMounted(() => {
   fetchShowtimeData()

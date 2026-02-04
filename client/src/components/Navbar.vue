@@ -28,9 +28,9 @@ export default {
             <div class="navbar-start">
                 <router-link class="navbar-item" to="/movies">Movies</router-link>
                 <router-link class="navbar-item" to="/seats?id=3">Seats</router-link>
-                <router-link class="navbar-item" to="/seat-selector?id=3&tickets=1&seatType=single">Seat Selection</router-link>
-                <router-link class="navbar-item" to="/email-verification">Email Verification</router-link>
-                <router-link class="navbar-item" to="/payment?email=example@gmail.com">Payment</router-link>
+                <router-link class="navbar-item" to="/seat-selector?id=3&tickets=3&seatType=single">Seat Selection</router-link>
+                <router-link class="navbar-item" to="/email-verification?id=3&tickets=3&seatType=Single&seats=E13,F13,G13">Email Verification</router-link>
+                <router-link class="navbar-item" to="/payment?email=Example@gmail.com&id=3&tickets=3&seatType=Single&seats=E13,F13,G13">Payment</router-link>
             </div>
 
             <div class="navbar-end">
