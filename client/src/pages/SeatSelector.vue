@@ -60,6 +60,7 @@ import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const $router = useRouter()
 const tickets = parseInt(route.query.tickets) || 1
+const uuid = localStorage.getItem("UserId") || crypto.randomUUID();
 const showtimeId = route.query.id
 const numRows = 8
 const seatsPerRow = 15
@@ -82,7 +83,6 @@ function createSeatLayout() {
       rowSeats.push({
         id: seatId,
         number: seat,
-        occupied: Math.random() < 0.2
       })
     }
     layout.push(rowSeats)
@@ -92,12 +92,33 @@ function createSeatLayout() {
 
 seatLayout.value = createSeatLayout()
 
-function toggleSeatSelection(seatId) {
+function updateTakenSeats(takenSeats) {
+  for (let row = 0; row < numRows; row++) {
+    for (let seatIndex = 0; seatIndex < seatsPerRow; seatIndex++) {
+      const seat = seatLayout.value[row][seatIndex];
+      if (selectedSeats.value.includes(seat.id)) continue;
+
+      if (takenSeats.includes(seat.id)) {
+        seat.occupied = true;
+      } else {
+        seat.occupied = false;
+      }
+    }
+  }
+}
+
+(async () => {
+  const res = await fetch(`http://localhost:5000/getAvailableSeats`);
+  const takenSeats = await res.json();
+  updateTakenSeats(takenSeats);
+})();
+
+async function toggleSeatSelection(seatId) {
   const seat = seatLayout.value.flat().find(s => s.id === seatId)
   if (seat && seat.occupied) {
     return 
   }
-
+  
   const idx = selectedSeats.value.indexOf(seatId)
   if (idx === -1) {
     selectedSeats.value.push(seatId)
@@ -107,6 +128,25 @@ function toggleSeatSelection(seatId) {
   
   if (selectedSeats.value.length > tickets) {
     selectedSeats.value.splice(0, selectedSeats.value.length - tickets)
+  }
+
+  if (selectedSeats.value.includes(seatId)) {
+    const res = await fetch(`http://localhost:5000/selectSeat/${seatId}`, {
+      method: 'POST',
+    });
+    
+    const { takenSeats, Success } = await res.json();
+    if (Success === false) {
+        selectedSeats.value.splice(idx, 1);
+  }
+  updateTakenSeats(takenSeats);
+} else {
+    const res = await fetch(`http://localhost:5000/unselectSeat/${seatId}`, {
+      method: 'POST',
+    });
+
+    const takenSeats = await res.json();
+    updateTakenSeats(takenSeats);
   }
 }
 
@@ -158,6 +198,9 @@ function proceedToPayment() {
 
 onMounted(() => {
   fetchShowtimeData()
+  if (!localStorage.getItem("UserId")) {
+    localStorage.setItem("UserId", JSON.stringify(uuid));
+  }
 })
 
 </script>
