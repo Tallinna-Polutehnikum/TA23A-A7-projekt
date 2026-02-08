@@ -15,7 +15,7 @@
               <p><strong>Tickets:</strong> {{ bookingDetails.ticketCount }}</p>
               <hr class="my-3">
               <p class="has-text-weight-bold is-size-5">
-                Total: €{{ totalAmount }}
+                <strong>Total: €{{ totalAmount }}</strong>
               </p>
             </div>
             <h1 class="title has-text-centered is-size-4">Payment Method</h1>
