@@ -7,15 +7,16 @@ const router = useRouter();
 
 // Movie data
 const movieData = ref(null);
+const errorMessage = ref(null);
 
 // Gallery
 const showGallery = ref(false);
 const currentIndex = ref(0);
 
 // Filters
-const selectedCity = ref("All cinemas");
+const selectedLocation = ref("All cinemas");
 const selectedDay = ref("All days");
-const cities = ref(["All cinemas"]);
+const locations = ref(["All cinemas"]);
 const days = ref(["All days"]);
 
 // Utils
@@ -30,7 +31,8 @@ function formatDate(date) {
 // Fetch movie by ID from backend, or first movie if no ID
 const fetchMovie = async () => {
   try {
-    let id = route.params.id;
+    errorMessage.value = null;
+    let id = route.query.id;
 
     // If no ID, fetch all movies and pick first
     if (!id) {
@@ -42,13 +44,17 @@ const fetchMovie = async () => {
     }
 
     const res = await fetch(`http://localhost:5000/movies/${id}`);
-    if (!res.ok) throw new Error("Movie not found");
+    if (!res.ok) {
+      errorMessage.value = `Movie with ID ${id} not found`;
+      movieData.value = null;
+      return;
+    }
     const data = await res.json();
     movieData.value = data;
 
-    // Extract unique cities from showtimes
-    const movieCities = data.showtimes.map(s => s.city);
-    cities.value = ["All cinemas", ...new Set(movieCities)];
+    // Extract unique locations from showtimes
+    const movieLocations = data.showtimes.map(s => s.location);
+    locations.value = ["All cinemas", ...new Set(movieLocations)];
 
     // Fill next 7 days dynamically
     days.value = ["All days"];
@@ -59,13 +65,15 @@ const fetchMovie = async () => {
     }
   } catch (err) {
     console.error(err);
+    errorMessage.value = "Error loading movie information";
+    movieData.value = null;
   }
 };
 
 onMounted(fetchMovie);
 
 // Watch for route changes
-watch(() => route.params.id, () => {
+watch(() => route.query.id, () => {
   fetchMovie();
 });
 
@@ -73,9 +81,9 @@ watch(() => route.params.id, () => {
 const filteredShowtimes = computed(() => {
   if (!movieData.value) return [];
   return movieData.value.showtimes.filter(s => {
-    const matchCity = selectedCity.value === "All cinemas" || s.city === selectedCity.value;
+    const matchLocation = selectedLocation.value === "All cinemas" || s.location === selectedLocation.value;
     const matchDay = selectedDay.value === "All days" || formatDate(s.show_date) === selectedDay.value;
-    return matchCity && matchDay;
+    return matchLocation && matchDay;
   }).sort((a, b) => new Date(`${a.show_date}T${a.show_time}`) - new Date(`${b.show_date}T${b.show_time}`));
 });
 
@@ -93,11 +101,21 @@ const prevPhoto = () => (currentIndex.value = (currentIndex.value - 1 + photos.v
 
 // Scroll to showtimes
 const goToShowtimes = () => { document.getElementById("showtimes").scrollIntoView({ behavior: "smooth" }); };
-const goToSeats = () => { router.push("/seats"); };
+const goToSeats = (showtimeId) => { router.push({ path: '/seats', query: { id: showtimeId } }); };
 </script>
 
 <template>
-  <div v-if="movieData">
+  <div>
+    <!-- Error message -->
+    <div v-if="errorMessage" class="box has-text-centered" style="margin: 40px auto; max-width: 600px; background-color: #fee; border-left: 4px solid #f44;">
+      <h2 class="title is-4 has-text-danger">Error</h2>
+      <p>{{ errorMessage }}</p>
+      <button class="button is-primary mt-4" @click="$router.push('/movies')">
+        Go Back to Movies
+      </button>
+    </div>
+
+    <div v-else-if="movieData">
     <!-- Main header image -->
     <div class="box cinema-img-box">
       <img :src="`http://localhost:5000/${movieData.images[0]?.film_header_image}`" alt="Cinema" class="cinema-img" />
@@ -156,8 +174,8 @@ const goToSeats = () => { router.push("/seats"); };
       <div class="field is-grouped is-align-items-center is-justify-content-center">
         <div class="control">
           <div class="select is-primary">
-            <select v-model="selectedCity">
-              <option v-for="city in cities" :key="city">{{ city }}</option>
+            <select v-model="selectedLocation">
+              <option v-for="location in locations" :key="location">{{ location }}</option>
             </select>
           </div>
         </div>
@@ -181,9 +199,9 @@ const goToSeats = () => { router.push("/seats"); };
           class="box showtime-box"
         >
           <div>
-            <strong>{{ formatDate(s.show_date) }} {{ s.show_time }} </strong> - {{ s.location }} - {{ s.city }}
+            <strong>{{ formatDate(s.show_date) }} {{ s.show_time }} </strong> - {{ s.location }}
           </div>
-          <button class="button is-success is-pulled-right" @click="goToSeats">Find Seats</button>
+          <button class="button is-success is-pulled-right" @click="goToSeats(s.id)">Find Seats</button>
         </div>
       </div>
     </div>
@@ -197,12 +215,13 @@ const goToSeats = () => { router.push("/seats"); };
         <button class="button is-success nav-btn next-btn" @click="nextPhoto">›</button>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.cinema-img-box { width: 100%; max-width: 1500px; margin-left: 5px; margin-top: 50px; }
-.cinema-img { width: 100%; height: auto; }
+.cinema-img-box { width: 100%; max-width: 1500px; margin-left: 5px; margin-top: 50px; overflow: hidden; }
+.cinema-img { width: 100%; height: auto; object-fit: cover; object-position: center; filter: none !important; }
 .trailer-film-columns { display: flex; gap: 40px; margin: 40px auto; max-width: 1200px; }
 .trailer-box, .film-info-box { flex: 1; padding: 15px; box-sizing: border-box; }
 .film-info-box { line-height: 1.9; height: 20rem; margin-top: 7.1%; }

@@ -12,7 +12,7 @@ const props = defineProps({
 const router = useRouter();
 
 const goToMovies = () => {
-  router.push(`/movies/${props.movie.id}`);
+  router.push({ path: '/movies', query: { id: props.movie.id } });
 };
 </script>
 
