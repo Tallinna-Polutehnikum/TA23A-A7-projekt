@@ -4,7 +4,12 @@ import { Router } from "express";
 import getMovies from "./controllers/getMovies.js";
 import { getMovieInfo } from "./controllers/getMovieInfo.js";
 import { getShowtimes } from "./controllers/getShowtimes.js";
-import { getAvailableSeats, selectSeat, unselectSeat } from "./controllers/seatController.js";
+import {
+	getShowtimeSeats,
+	selectShowtimeSeat,
+	unselectShowtimeSeat,
+	releaseUserSeats,
+} from "./controllers/seatController.js";
 
 const router = Router();
 
@@ -13,8 +18,9 @@ router.get("/home", getMovies);
 router.get("/movies/:id", getMovieInfo);
 router.get("/showtimes/:id", getShowtimes);
 
-router.get("/getAvailableSeats", getAvailableSeats);
-router.post("/selectSeat/:id", selectSeat);
-router.post("/unselectSeat/:id", unselectSeat);
+router.get("/showtimes/:id/seats", getShowtimeSeats);
+router.post("/showtimes/:id/seats/select", selectShowtimeSeat);
+router.post("/showtimes/:id/seats/unselect", unselectShowtimeSeat);
+router.post("/showtimes/:id/seats/release", releaseUserSeats);
 
 export default router;
