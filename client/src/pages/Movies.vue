@@ -28,6 +28,15 @@ function formatDate(date) {
   return `${dd}.${mm}.${yy}`;
 }
 
+function formatTime(timeString) {
+  // Extract time from ISO format or HH:MM:SS format
+  const match = timeString.match(/(\d{2}):(\d{2})(?::(\d{2}))?/);
+  if (match) {
+    return `${match[1]}:${match[2]}`;
+  }
+  return timeString;
+}
+
 // Fetch movie by ID from backend, or first movie if no ID
 const fetchMovie = async () => {
   try {
@@ -56,13 +65,10 @@ const fetchMovie = async () => {
     const movieLocations = data.showtimes.map(s => s.location);
     locations.value = ["All cinemas", ...new Set(movieLocations)];
 
-    // Fill next 7 days dynamically
-    days.value = ["All days"];
-    for (let i = 0; i < 7; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-      days.value.push(formatDate(d));
-    }
+    // Extract unique dates from showtimes
+    const uniqueDates = new Set(data.showtimes.map(s => formatDate(s.show_date)));
+    days.value = ["All days", ...Array.from(uniqueDates).sort()];
+
   } catch (err) {
     console.error(err);
     errorMessage.value = "Error loading movie information";
@@ -90,7 +96,7 @@ const filteredShowtimes = computed(() => {
 // Gallery photos
 const photos = computed(() => {
   if (!movieData.value || !movieData.value.images) return [];
-  return movieData.value.images.flatMap(img => img.gallery.map(g => g.image));
+  return movieData.value.images.flatMap(img => img.gallery.map(g => `http://localhost:5000/${g.image}`));
 });
 
 // Gallery controls
@@ -199,7 +205,7 @@ const goToSeats = (showtimeId) => { router.push({ path: '/seats', query: { id: s
           class="box showtime-box"
         >
           <div>
-            <strong>{{ formatDate(s.show_date) }} {{ s.show_time }} </strong> - {{ s.location }}
+            <strong>{{ formatDate(s.show_date) }} {{ formatTime(s.show_time) }}</strong> - {{ s.location }}
           </div>
           <button class="button is-success is-pulled-right" @click="goToSeats(s.id)">Find Seats</button>
         </div>
@@ -220,8 +226,8 @@ const goToSeats = (showtimeId) => { router.push({ path: '/seats', query: { id: s
 </template>
 
 <style scoped>
-.cinema-img-box { width: 100%; max-width: 1500px; margin-left: 5px; margin-top: 50px; overflow: hidden; }
-.cinema-img { width: 100%; height: auto; object-fit: cover; object-position: center; filter: none !important; }
+.cinema-img-box { width: 100%; max-width: 800px; max-height: 300px; margin: 40px auto; overflow: hidden; }
+.cinema-img { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: none !important; }
 .trailer-film-columns { display: flex; gap: 40px; margin: 40px auto; max-width: 1200px; }
 .trailer-box, .film-info-box { flex: 1; padding: 15px; box-sizing: border-box; }
 .film-info-box { line-height: 1.9; height: 20rem; margin-top: 7.1%; }
