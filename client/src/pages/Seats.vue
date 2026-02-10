@@ -46,10 +46,10 @@
 						</button>
 
 						<button
-							class="button is-image seat-button"
+							class="button is-image seat-button not-allowed"
 							:class="{ 'is-primary': seatType === 'double' }"
-							@click="seatType = 'double'"
-						>
+							>
+							<!-- @click="seatType = 'double'" If ever db seats is needed then un comment and move up 1 space-->
 							<img
 								class="seat-image"
 								:src="getDoubleSeatImage"
@@ -225,6 +225,11 @@ export default {
 
 .seat-image {
 	max-width: 50px;
+}
+
+.not-allowed {
+	cursor: not-allowed;
+	opacity: 0.25;
 }
 
 .ticket-number-display {
