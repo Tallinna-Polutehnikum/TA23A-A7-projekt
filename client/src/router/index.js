@@ -9,6 +9,7 @@ import Payment from "../pages/Payment.vue";
 import Panel from "../pages/Panel.vue";
 import About from "../pages/About.vue";
 import Contact from "../pages/Contact.vue";
+import Confirmation from "../pages/Confirmation.vue";
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +23,7 @@ const router = createRouter({
 		{ path: "/panel", component: Panel },
 		{ path: "/About", component: About },
 		{ path: "/Contact", component: Contact },
+		{ path: "/Confirmation", component: Confirmation },
 	],
 });
 
