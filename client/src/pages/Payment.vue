@@ -126,8 +126,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
+const router = useRouter();
 const route = useRoute()
 const selectedMethod = ref('')
 const processing = ref(false)
@@ -136,11 +137,14 @@ const cardError = ref({ number: '', name: '', expiry: '', cvv: '' })
 
 const bookingDetails = ref({
   movie: '',
+  genre: '',
+  duration: '',
   date: '',
   time: '',
   location: '',
   seats: '',
-  ticketCount: 0
+  ticketCount: 0,
+  showtimeId: ''
 })
 
 function formatDate(dateString) {
@@ -167,11 +171,14 @@ async function fetchShowtimeData() {
     
     bookingDetails.value = {
       movie: movie.title,
+      genre: movie.genre,
+      duration: movie.duration,
       date: formatDate(showtime.show_date),
       time: formatTime(showtime.show_time),
       location: showtime.location,
       seats: route.query.seats || '',
-      ticketCount: parseInt(route.query.tickets) || 0
+      ticketCount: parseInt(route.query.tickets) || 0,
+      showtimeId
     }
   } catch (error) {
     console.error('Error fetching showtime data:', error)
@@ -226,7 +233,22 @@ function processPayment() {
   processing.value = true
   setTimeout(() => {
     processing.value = false
-    alert('Payment successful!')
+    router.push({
+      path: "/confirmation",
+      query: {
+        email: route.query.email,
+        title: bookingDetails.value.movie,
+        genre: bookingDetails.value.genre,
+        duration: bookingDetails.value.duration,
+        date: bookingDetails.value.date,
+        time: bookingDetails.value.time,
+        location: bookingDetails.value.location,
+        seats: bookingDetails.value.seats,
+        tickets: bookingDetails.value.ticketCount,
+        total: totalAmount.value,
+        showtimeId: bookingDetails.value.showtimeId,
+      }
+    });
   }, 2000)
 }
 </script>
