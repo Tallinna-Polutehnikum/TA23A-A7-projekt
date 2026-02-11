@@ -1,7 +1,19 @@
 <script setup>
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 
 const router = useRouter();
+const route = useRoute();
+
+const email = route.query.email;
+const title = route.query.title;
+const genre = route.query.genre;
+const duration = route.query.duration;
+const date = route.query.date;
+const time = route.query.time;
+const location = route.query.location;
+const seats = route.query.seats;
+const tickets = route.query.tickets;
+const total = route.query.total;
 
 function goToHome() {
     router.push("/");
@@ -17,22 +29,23 @@ function goToHome() {
                         <h1 class="title has-text-centered mb-5">Thank you for your purchase!</h1>
                         <p class="has-text-centered mb-5">
                             Thank you for purchasing your movie ticket! We have sent the ticket on the e-mail
-                            address: example.example@gmail.com
+                            address: {{ email }}
                         </p>
                         <div class="mb-5">
                             <p><strong>Film info</strong></p>
-                            <p>Title:</p>
-                            <p>Genre:</p>
-                            <p>Duration:</p>
+                            <p>Title: {{ title }}</p>
+                            <p>Genre: {{ genre }}</p>
+                            <p>Duration: {{ duration }} min</p>
                         </div>
                         <div class="mb-5">
                             <p><strong>Showtime</strong></p>
-                            <p>Date & Time:</p>
-                            <p>Location:</p>
-                            <p>Seat:</p>
+                            <p>Date & Time: {{ date }} at {{ time }}</p>
+                            <p>Location: {{ location }}</p>
+                            <p>Seats: {{ seats }}</p>
                         </div>
-                        <div class="content mb-5">
-                            <p>Ticket number:</p>
+                        <div class="mb-5">
+                            <p>Tickets: {{ tickets }}</p>
+                            <p>Total: €{{ total }}</p>
                         </div>
                         <p class="has-text-centered mb-5">
                             Please present this ticket (digital or printed) at the entrance.<br>
@@ -51,5 +64,4 @@ function goToHome() {
 </template>
 
 <style scoped>
-
 </style>
