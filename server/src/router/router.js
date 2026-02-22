@@ -1,15 +1,15 @@
 import { Router } from "express";
 
 // importige enda controller
-import getMovies from "./controllers/getMovies.js";
-import { getMovieInfo } from "./controllers/getMovieInfo.js";
-import { getShowtimes } from "./controllers/getShowtimes.js";
+import getMovies from "../controllers/getMovies.js";
+import { getMovieInfo } from "../controllers/getMovieInfo.js";
+import { getShowtimes } from "../controllers/getShowtimes.js";
 import {
 	getShowtimeSeats,
 	selectShowtimeSeat,
 	unselectShowtimeSeat,
 	releaseUserSeats,
-} from "./controllers/seatController.js";
+} from "../controllers/seatController.js";
 
 const router = Router();
 

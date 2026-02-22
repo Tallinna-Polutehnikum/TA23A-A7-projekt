@@ -38,6 +38,8 @@ Generate prisma client:
 ```bash
 npx prisma generate
 ```
+Download images/ folder from [drive](https://drive.google.com/drive/folders/1XZkrBAFWPOiPnGyCzdSgVqBkMQe510GP?usp=drive_link) and put it in public/ directory. <br>
+<br>
 Seed the database:
 ```bash
 npm run seed
