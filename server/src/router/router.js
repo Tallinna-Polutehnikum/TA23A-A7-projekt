@@ -10,6 +10,7 @@ import {
 	unselectShowtimeSeat,
 	releaseUserSeats,
 } from "../controllers/seatController.js";
+import { createBooking } from "../controllers/createBooking.js";
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.get("/showtimes/:id/seats", getShowtimeSeats);
 router.post("/showtimes/:id/seats/select", selectShowtimeSeat);
 router.post("/showtimes/:id/seats/unselect", unselectShowtimeSeat);
 router.post("/showtimes/:id/seats/release", releaseUserSeats);
+router.post("/bookings", createBooking);
 
 export default router;

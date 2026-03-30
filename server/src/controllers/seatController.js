@@ -1,3 +1,7 @@
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
 const showtimeSeatMap = new Map();
 
 function getShowtimeMap(showtimeId) {
@@ -7,21 +11,48 @@ function getShowtimeMap(showtimeId) {
     return showtimeSeatMap.get(showtimeId);
 }
 
-export function getShowtimeSeats(req, res) {
+async function getPersistedTakenSeats(showtimeId) {
+    const showtimeIdNumber = Number(showtimeId);
+    if (!Number.isInteger(showtimeIdNumber) || showtimeIdNumber <= 0) {
+        return [];
+    }
+
+    const seats = await prisma.seats.findMany({
+        where: {
+            showtime_id: showtimeIdNumber,
+            booking_seats: {
+                some: {},
+            },
+        },
+        select: {
+            seat_number: true,
+        },
+    });
+
+    return seats.map((seat) => seat.seat_number);
+}
+
+export async function getShowtimeSeats(req, res, next) {
     const showtimeId = req.params.id;
     const userId = req.query.userId;
-    const seatMap = getShowtimeMap(showtimeId);
-    const takenSeats = Array.from(seatMap.keys());
-    const userSeats = userId
-        ? Array.from(seatMap.entries())
-            .filter(([, ownerId]) => ownerId === userId)
-            .map(([seatId]) => seatId)
-        : [];
+    try {
+        const seatMap = getShowtimeMap(showtimeId);
+        const temporaryTakenSeats = Array.from(seatMap.keys());
+        const persistedTakenSeats = await getPersistedTakenSeats(showtimeId);
+        const takenSeats = Array.from(new Set([...temporaryTakenSeats, ...persistedTakenSeats]));
+        const userSeats = userId
+            ? Array.from(seatMap.entries())
+                .filter(([, ownerId]) => ownerId === userId)
+                .map(([seatId]) => seatId)
+            : [];
 
-    res.json({ takenSeats, userSeats });
+        res.json({ takenSeats, userSeats });
+    } catch (error) {
+        next(error);
+    }
 }
 
-export function selectShowtimeSeat(req, res) {
+export async function selectShowtimeSeat(req, res, next) {
     const showtimeId = req.params.id;
     const { seatId, userId } = req.body || {};
     if (!seatId || !userId) {
@@ -29,21 +60,37 @@ export function selectShowtimeSeat(req, res) {
         return;
     }
 
-    const seatMap = getShowtimeMap(showtimeId);
-    const currentOwner = seatMap.get(seatId);
-    let success = false;
+    try {
+        const persistedTakenSeats = await getPersistedTakenSeats(showtimeId);
+        if (persistedTakenSeats.includes(seatId)) {
+            res.json({
+                takenSeats: persistedTakenSeats,
+                success: false,
+            });
+            return;
+        }
 
-    if (!currentOwner) {
-        seatMap.set(seatId, userId);
-        success = true;
-    } else if (currentOwner === userId) {
-        success = true;
+        const seatMap = getShowtimeMap(showtimeId);
+        const currentOwner = seatMap.get(seatId);
+        let success = false;
+
+        if (!currentOwner) {
+            seatMap.set(seatId, userId);
+            success = true;
+        } else if (currentOwner === userId) {
+            success = true;
+        }
+
+        const temporaryTakenSeats = Array.from(seatMap.keys());
+        const takenSeats = Array.from(new Set([...temporaryTakenSeats, ...persistedTakenSeats]));
+
+        res.json({ takenSeats, success });
+    } catch (error) {
+        next(error);
     }
-
-    res.json({ takenSeats: Array.from(seatMap.keys()), success });
 }
 
-export function unselectShowtimeSeat(req, res) {
+export async function unselectShowtimeSeat(req, res, next) {
     const showtimeId = req.params.id;
     const { seatId, userId } = req.body || {};
     if (!seatId || !userId) {
@@ -51,15 +98,23 @@ export function unselectShowtimeSeat(req, res) {
         return;
     }
 
-    const seatMap = getShowtimeMap(showtimeId);
-    if (seatMap.get(seatId) === userId) {
-        seatMap.delete(seatId);
-    }
+    try {
+        const seatMap = getShowtimeMap(showtimeId);
+        if (seatMap.get(seatId) === userId) {
+            seatMap.delete(seatId);
+        }
 
-    res.json({ takenSeats: Array.from(seatMap.keys()) });
+        const temporaryTakenSeats = Array.from(seatMap.keys());
+        const persistedTakenSeats = await getPersistedTakenSeats(showtimeId);
+        const takenSeats = Array.from(new Set([...temporaryTakenSeats, ...persistedTakenSeats]));
+
+        res.json({ takenSeats });
+    } catch (error) {
+        next(error);
+    }
 }
 
-export function releaseUserSeats(req, res) {
+export async function releaseUserSeats(req, res, next) {
     const showtimeId = req.params.id;
     const { userId } = req.body || {};
     if (!userId) {
@@ -67,12 +122,20 @@ export function releaseUserSeats(req, res) {
         return;
     }
 
-    const seatMap = getShowtimeMap(showtimeId);
-    for (const [seatId, ownerId] of seatMap.entries()) {
-        if (ownerId === userId) {
-            seatMap.delete(seatId);
+    try {
+        const seatMap = getShowtimeMap(showtimeId);
+        for (const [seatId, ownerId] of seatMap.entries()) {
+            if (ownerId === userId) {
+                seatMap.delete(seatId);
+            }
         }
-    }
 
-    res.json({ takenSeats: Array.from(seatMap.keys()) });
+        const temporaryTakenSeats = Array.from(seatMap.keys());
+        const persistedTakenSeats = await getPersistedTakenSeats(showtimeId);
+        const takenSeats = Array.from(new Set([...temporaryTakenSeats, ...persistedTakenSeats]));
+
+        res.json({ takenSeats });
+    } catch (error) {
+        next(error);
+    }
 }

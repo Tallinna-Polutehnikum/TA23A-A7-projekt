@@ -117,6 +117,10 @@
             >
               Pay €{{ totalAmount }}
             </button>
+
+            <p v-if="paymentError" class="help is-danger mt-3 has-text-centered">
+              {{ paymentError }}
+            </p>
           </div>
         </div>
       </div>
@@ -132,6 +136,7 @@ const router = useRouter();
 const route = useRoute()
 const selectedMethod = ref('')
 const processing = ref(false)
+const paymentError = ref('')
 const cardDetails = ref({ number: '', name: '', expiry: '', cvv: '' })
 const cardError = ref({ number: '', name: '', expiry: '', cvv: '' })
 
@@ -206,7 +211,9 @@ function formatCVV(e) {
   cardDetails.value.cvv = e.target.value.replace(/\D/g, '').slice(0, 3)
 }
 
-function processPayment() {
+async function processPayment() {
+  paymentError.value = ''
+
   if (!selectedMethod.value) return
   
   if (selectedMethod.value === 'card') {
@@ -231,11 +238,44 @@ function processPayment() {
   }
   
   processing.value = true
-  setTimeout(() => {
-    processing.value = false
+
+  try {
+    const seatNumbers = String(bookingDetails.value.seats || '')
+      .split(',')
+      .map((seat) => seat.trim())
+      .filter(Boolean)
+
+    const bookingResponse = await fetch('http://localhost:5000/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        showtimeId: bookingDetails.value.showtimeId,
+        numberOfTickets: bookingDetails.value.ticketCount,
+        seats: seatNumbers,
+      }),
+    })
+
+    if (!bookingResponse.ok) {
+      const errorBody = await bookingResponse.json().catch(() => ({}))
+      paymentError.value = errorBody.error || 'Could not complete payment. Please try again.'
+      return
+    }
+
+    const bookingData = await bookingResponse.json()
+
+    const storedUserId = localStorage.getItem('UserId')
+    const userId = storedUserId ? storedUserId.replace(/^"|"$/g, '') : ''
+    if (userId) {
+      const timerStorageKey = `seatTimer:${bookingDetails.value.showtimeId}:${userId}`
+      const ticketsStorageKey = `seatTickets:${bookingDetails.value.showtimeId}:${userId}`
+      localStorage.removeItem(timerStorageKey)
+      localStorage.removeItem(ticketsStorageKey)
+    }
+
     router.push({
       path: "/confirmation",
       query: {
+        bookingId: bookingData.bookingId,
         email: route.query.email,
         title: bookingDetails.value.movie,
         genre: bookingDetails.value.genre,
@@ -249,7 +289,12 @@ function processPayment() {
         showtimeId: bookingDetails.value.showtimeId,
       }
     });
-  }, 2000)
+  } catch (error) {
+    console.error('Error saving booking:', error)
+    paymentError.value = 'Could not complete payment. Please try again.'
+  } finally {
+    processing.value = false
+  }
 }
 </script>
 
