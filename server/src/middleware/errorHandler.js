@@ -1,6 +1,6 @@
 // hetkel mitte veel kasutada :)
 
-function errorHandler(error, req, res, lint_test) {
+function errorHandler(error, req, res) {
     error.statusCode = error.statusCode || 500;
     error.status = error.status || "error";
     
