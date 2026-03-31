@@ -52,7 +52,7 @@ model movies {
   title       String      @db.VarChar(255)
   genre       String      @db.VarChar(255)
   duration    Int
-  age_rating  String      @db.VarChar(10)
+  age_rating  String      @db.VarChar(20)
   director    String      @db.VarChar(255)
   cast        String      @db.Text
   trailer_url String      @db.Text
