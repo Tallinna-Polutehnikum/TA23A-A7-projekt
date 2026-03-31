@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 const showtimeSeatMap = new Map();
 
 function getShowtimeMap(showtimeId) {
-    debugger;
     if (!showtimeSeatMap.has(showtimeId)) {
         showtimeSeatMap.set(showtimeId, new Map());
     }
