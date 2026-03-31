@@ -1,11 +1,6 @@
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref, defineEmits } from 'vue';
 
-const props = defineProps({
-  genres: Array,
-  search: String,
-  genre: String
-});
 const emit = defineEmits(['update:search', 'update:genre']);
 
 const isOpen = ref(false);

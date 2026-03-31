@@ -152,6 +152,8 @@ const bookingDetails = ref({
   showtimeId: ''
 })
 
+const LINT_TEST = 'This is a lint test'
+
 function formatDate(dateString) {
   if (!dateString) return ''
   const date = new Date(dateString)

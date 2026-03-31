@@ -200,7 +200,7 @@ const goToSeats = (showtimeId) => { router.push({ path: '/seats', query: { id: s
         </div>
 
         <div
-          v-for="(s, index) in filteredShowtimes"
+          v-for="(s) in filteredShowtimes"
           :key="s.id"
           class="box showtime-box"
         >
