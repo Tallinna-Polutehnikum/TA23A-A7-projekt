@@ -194,8 +194,6 @@ onMounted(() => {
   fetchShowtimeData()
 })
 
-const Lint_test = "test"
-
 const totalAmount = computed(() => (bookingDetails.value.ticketCount * 8.54).toFixed(2))
 
 function selectMethod(method) {
