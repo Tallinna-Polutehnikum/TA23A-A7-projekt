@@ -263,15 +263,31 @@ async function processPayment() {
 
     const bookingData = await bookingResponse.json()
 
-    const storedUserId = localStorage.getItem('UserId')
-    const userId = storedUserId ? storedUserId.replace(/^"|"$/g, '') : ''
-    if (userId) {
-      const timerStorageKey = `seatTimer:${bookingDetails.value.showtimeId}:${userId}`
-      const ticketsStorageKey = `seatTickets:${bookingDetails.value.showtimeId}:${userId}`
-      localStorage.removeItem(timerStorageKey)
-      localStorage.removeItem(ticketsStorageKey)
+
+    // ✅ Save ticket locally
+    const existing = JSON.parse(localStorage.getItem('tickets') || '[]')
+
+    const newTicket = {
+      bookingId: bookingData.bookingId,
+      showtimeId: bookingDetails.value.showtimeId,
+      movie: bookingDetails.value.movie,
+      date: bookingDetails.value.date,
+      time: bookingDetails.value.time,
+      location: bookingDetails.value.location,
+      seatNumbers: bookingDetails.value.seats,
+      tickets: bookingDetails.value.ticketCount,
+      total: totalAmount.value
     }
 
+    existing.push(newTicket)
+    localStorage.setItem('tickets', JSON.stringify(existing))
+
+    // clear seat locks
+    const userId = (localStorage.getItem('UserId') || '').replace(/^"|"$/g, '')
+    if (userId) {
+      localStorage.removeItem(`seatTimer:${bookingDetails.value.showtimeId}:${userId}`)
+      localStorage.removeItem(`seatTickets:${bookingDetails.value.showtimeId}:${userId}`)
+    }
     router.push({
       path: "/confirmation",
       query: {

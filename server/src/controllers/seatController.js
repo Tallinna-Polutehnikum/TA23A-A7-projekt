@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const showtimeSeatMap = new Map();
+export const showtimeSeatMap = new Map();
 
 function getShowtimeMap(showtimeId) {
     if (!showtimeSeatMap.has(showtimeId)) {
