@@ -1,59 +1,23 @@
 # TA23A-A7-projekt
+TA23A-A7-projekt aka Cinema app is a full-stack web application that lets users browse movies, choose seats, and book tickets online. <br>
+<br>
 Clone repository:
 ```bash
 git clone https://github.com/Tallinna-Polutehnikum/TA23A-A7-projekt.git
 ```
-## How to setup front-end dev environment
-```bash
-cd client
-```
-Install required packages:
-```bash
-npm i
-```
-Run localhost server:
-```bash
-npm run dev
-```
-## How to setup back-end & database dev environment
-```bash
-cd server
-```
-Install required packages:
-```bash
-npm i
-```
-Open mysql workbench and create a new sql connection. Put the username as **root** and password as **mysql**, make sure you use port **3306**. <br>
-Also inside server/ directory create a **.env** file and paste there content from **.env.example**. <br>
-<br>
-Make a new sql file in mysql workbench and create a database:
-```bash
-CREATE DATABASE cinema;
-```
-Push the schema into mysql:
-```bash
-npx prisma db push
-```
-Generate prisma client:
-```bash
-npx prisma generate
-```
-Download images/ folder from [drive](https://drive.google.com/drive/folders/1XZkrBAFWPOiPnGyCzdSgVqBkMQe510GP?usp=drive_link) and put it in public/ directory. <br>
-<br>
-Seed the database:
-```bash
-npm run seed
-```
-Run localhost server:
-```bash
-npm run dev
-```
-## Some other useful commands for development
-After changing schema.prisma create a migration:
-```bash
-npx prisma migrate dev --name descriptive_name
-```
-Deploy the changes into mysql:
-```bash
-npx prisma migrate deploy
-```
+
+### Instructions on how to setup the project dev environment
+- [How to setup front-end](client/README.md)
+- [How to setup back-end](server/README.md)
+
+### Project tech stack
+[![Vue.js](https://img.shields.io/badge/Vue.js-green?logo=vuedotjs&logoColor=white)](https://vuejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-black?logo=express&logoColor=white)](https://expressjs.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-blue?logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![MySQL](https://img.shields.io/badge/MySQL-blue?logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Bulma](https://img.shields.io/badge/Bulma-turquoise?logo=bulma&logoColor=white)](https://bulma.io/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-yellow?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![HTML](https://img.shields.io/badge/HTML-orange?logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS](https://img.shields.io/badge/CSS-1572B6?logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![Node.js](https://img.shields.io/badge/Node.js-green?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Vite](https://img.shields.io/badge/Vite-purple?logo=vite&logoColor=white)](https://vitejs.dev/)
