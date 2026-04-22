@@ -34,6 +34,9 @@ export default {
                 <router-link class="navbar-item navbar-burger" to="/Panel">Panel</router-link>
             </div>
             <div class="navbar-end">
+                <router-link class="navbar-item navbar-burger" to="/my-tickets">
+                    Tickets
+                </router-link>
                 <div class="navbar-item">
                     <a class="button " @click="toggleTheme">
                         {{ theme === 'light' ? '☀️' : '🌙' }}

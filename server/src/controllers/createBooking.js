@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 export const createBooking = async (req, res, next) => {
   try {
-    const { showtimeId, numberOfTickets, seats } = req.body || {};
+    const { showtimeId, numberOfTickets, seats} = req.body || {};
 
     const parsedShowtimeId = Number(showtimeId);
     const parsedTicketCount = Number(numberOfTickets);

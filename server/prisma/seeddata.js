@@ -1,12 +1,12 @@
 const seatLayout = [
-    { row: "A", count: 16, type: "single" },
-    { row: "B", count: 16, type: "single" },
-    { row: "C", count: 16, type: "single" },
-    { row: "D", count: 8, type: "double" },
-    { row: "E", count: 8, type: "double" },
-    { row: "F", count: 16, type: "single" },
-    { row: "G", count: 16, type: "single" },
-    { row: "H", count: 16, type: "single" },
+    { row: "A", count: 15, type: "single" },
+    { row: "B", count: 15, type: "single" },
+    { row: "C", count: 15, type: "single" },
+    { row: "D", count: 15, type: "single" },
+    { row: "E", count: 15, type: "single" },
+    { row: "F", count: 15, type: "single" },
+    { row: "G", count: 15, type: "single" },
+    { row: "H", count: 15, type: "single" },
 ];
 
 function generateSeats() {
