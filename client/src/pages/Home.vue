@@ -8,7 +8,7 @@ const movies = ref([]); // all movies from backend
 const searchQuery = ref(''); // for search bar
 const selectedGenre = ref('All'); // filter
 const genres = ref([
-  'All', 'Animation', 'Anime', 'Ballet', 'Documentary', 'Drama', 
+  'All', 'Anime', 'Ballet', 'Documentary', 'Drama', 
   'Fantasy', 'Family', 'Comedy', 'Concert', 'Crime', 'Action', 
   'Black humor', 'Mystery', 'Music', 'Musical', 'Doll movie', 
   'Opera', 'Horror', 'Adventure', 'Romance', 'Sport', 'Theater', 'Thiller', 'Ci-Fi'

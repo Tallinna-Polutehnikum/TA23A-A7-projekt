@@ -33,7 +33,7 @@ const movies = [
     },
     {
         title: "Spirited Away",
-        genre: "Animation",
+        genre: "Anime",
         duration: 125,
         age_rating: "PG",
         director: "Hayao Miyazaki",
