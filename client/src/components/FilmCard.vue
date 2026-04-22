@@ -29,6 +29,22 @@ const goToMovies = () => {
 </template>
 
 <style scoped>
+.card {
+  height: 100%;
+}
+
+.card-image {
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
 .card:hover {
   cursor: pointer;
 }
