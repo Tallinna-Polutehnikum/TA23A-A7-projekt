@@ -132,11 +132,13 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
-const router = useRouter();
+const router = useRouter()
 const route = useRoute()
+
 const selectedMethod = ref('')
 const processing = ref(false)
 const paymentError = ref('')
+
 const cardDetails = ref({ number: '', name: '', expiry: '', cvv: '' })
 const cardError = ref({ number: '', name: '', expiry: '', cvv: '' })
 
@@ -152,28 +154,33 @@ const bookingDetails = ref({
   showtimeId: ''
 })
 
+const totalAmount = computed(() =>
+  (bookingDetails.value.ticketCount * 8.54).toFixed(2)
+)
+
 function formatDate(dateString) {
   if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-GB')
+  return new Date(dateString).toLocaleDateString('en-GB')
 }
 
 function formatTime(timeString) {
   if (!timeString) return ''
-  const time = new Date(timeString)
-  return time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  return new Date(timeString).toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 async function fetchShowtimeData() {
   try {
     const showtimeId = route.query.id
-    
+
     const showtimeResponse = await fetch(`http://localhost:5000/showtimes/${showtimeId}`)
     const showtime = await showtimeResponse.json()
-    
+
     const movieResponse = await fetch(`http://localhost:5000/movies/${showtime.movie_id}`)
     const movie = await movieResponse.json()
-    
+
     bookingDetails.value = {
       movie: movie.title,
       genre: movie.genre,
@@ -190,11 +197,7 @@ async function fetchShowtimeData() {
   }
 }
 
-onMounted(() => {
-  fetchShowtimeData()
-})
-
-const totalAmount = computed(() => (bookingDetails.value.ticketCount * 8.54).toFixed(2))
+onMounted(fetchShowtimeData)
 
 function selectMethod(method) {
   selectedMethod.value = method
@@ -215,10 +218,8 @@ async function processPayment() {
   paymentError.value = ''
 
   if (!selectedMethod.value) return
-  
+
   if (selectedMethod.value === 'card') {
-    cardError.value = { number: '', name: '', expiry: '', cvv: '' }
-    
     if (cardDetails.value.number.length < 13) {
       cardError.value.number = 'Card number must be at least 13 digits'
       return
@@ -228,7 +229,7 @@ async function processPayment() {
       return
     }
     if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardDetails.value.expiry)) {
-      cardError.value.expiry = 'Invalid expiry date (use MM/YY)'
+      cardError.value.expiry = 'Invalid expiry date'
       return
     }
     if (cardDetails.value.cvv.length !== 3) {
@@ -236,13 +237,13 @@ async function processPayment() {
       return
     }
   }
-  
+
   processing.value = true
 
   try {
     const seatNumbers = String(bookingDetails.value.seats || '')
       .split(',')
-      .map((seat) => seat.trim())
+      .map(s => s.trim())
       .filter(Boolean)
 
     const bookingResponse = await fetch('http://localhost:5000/bookings', {
@@ -256,18 +257,30 @@ async function processPayment() {
     })
 
     if (!bookingResponse.ok) {
-      const errorBody = await bookingResponse.json().catch(() => ({}))
-      paymentError.value = errorBody.error || 'Could not complete payment. Please try again.'
+      const err = await bookingResponse.json().catch(() => ({}))
+      paymentError.value = err.error || 'Payment failed'
       return
     }
 
     const bookingData = await bookingResponse.json()
 
+    const userId = (localStorage.getItem('UserId') || '').replace(/^"|"$/g, '')
 
-    // ✅ Save ticket locally
+    // RELEASE SEATS (temporary locks)
+    await fetch(`http://localhost:5000/showtimes/${bookingDetails.value.showtimeId}/seats/release`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    })
+
+    // CLEAR LOCAL STORAGE LOCKS
+    localStorage.removeItem(`seatTimer:${bookingDetails.value.showtimeId}:${userId}`)
+    localStorage.removeItem(`seatTickets:${bookingDetails.value.showtimeId}:${userId}`)
+
+    // SAVE TICKET
     const existing = JSON.parse(localStorage.getItem('tickets') || '[]')
 
-    const newTicket = {
+    existing.push({
       bookingId: bookingData.bookingId,
       showtimeId: bookingDetails.value.showtimeId,
       movie: bookingDetails.value.movie,
@@ -277,17 +290,10 @@ async function processPayment() {
       seatNumbers: bookingDetails.value.seats,
       tickets: bookingDetails.value.ticketCount,
       total: totalAmount.value
-    }
+    })
 
-    existing.push(newTicket)
     localStorage.setItem('tickets', JSON.stringify(existing))
 
-    // clear seat locks
-    const userId = (localStorage.getItem('UserId') || '').replace(/^"|"$/g, '')
-    if (userId) {
-      localStorage.removeItem(`seatTimer:${bookingDetails.value.showtimeId}:${userId}`)
-      localStorage.removeItem(`seatTickets:${bookingDetails.value.showtimeId}:${userId}`)
-    }
     router.push({
       path: "/confirmation",
       query: {
@@ -304,23 +310,13 @@ async function processPayment() {
         total: totalAmount.value,
         showtimeId: bookingDetails.value.showtimeId,
       }
-    });
+    })
+
   } catch (error) {
-    console.error('Error saving booking:', error)
-    paymentError.value = 'Could not complete payment. Please try again.'
+    console.error(error)
+    paymentError.value = 'Payment failed'
   } finally {
     processing.value = false
   }
 }
 </script>
-
-<style scoped>
-.Method {
-  margin-left: 10%;
-  display: flex;
-  width: 80%;
-  height: 5vw;
-  margin-right: 10px;
-  font-size: large;
-}
-</style>

@@ -2,61 +2,50 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const cancelBooking = async (req, res, next) => {
+export const cancelBooking = async (req, res) => {
   try {
-    const { bookingId } = req.body || {};
+    const bookingId = Number(req.body.bookingId);
 
     if (!bookingId) {
-      return res.status(400).json({ error: "bookingId is required" });
+      return res.status(400).json({ success: false, error: "Missing bookingId" });
     }
 
-    const id = Number(bookingId);
-
-    const booking = await prisma.bookings.findUnique({
-      where: { id },
-      include: { booking_seats: true },
+    // STEP 1: FORCE GET seat_ids directly from table
+    const bookingSeats = await prisma.booking_seats.findMany({
+      where: { booking_id: bookingId },
+      select: { seat_id: true },
     });
 
-    if (!booking) {
-      return res.status(404).json({ error: "Booking not found" });
+    const seatIds = bookingSeats.map(s => s.seat_id);
+
+    // STEP 2: delete pivot
+    await prisma.booking_seats.deleteMany({
+      where: { booking_id: bookingId },
+    });
+
+    // STEP 3: free seats
+    if (seatIds.length > 0) {
+      await prisma.seats.updateMany({
+        where: { id: { in: seatIds } },
+        data: { seat_available: true },
+      });
     }
 
-    const seatIds = booking.booking_seats
-      .map(bs => bs.seat_id)
-      .filter(Boolean);
-
-    await prisma.$transaction(async (tx) => {
-      // 1. delete pivot table first
-      await tx.booking_seats.deleteMany({
-        where: { booking_id: id },
-      });
-
-      // 2. free seats only if seatIds exist
-      if (seatIds.length > 0) {
-        await tx.seats.updateMany({
-          where: {
-            id: { in: seatIds },
-          },
-          data: {
-            seat_available: true,
-          },
-        });
-      }
-
-      // 3. delete booking last
-      await tx.bookings.delete({
-        where: { id },
-      });
+    // STEP 4: delete booking
+    await prisma.bookings.delete({
+      where: { id: bookingId },
     });
 
     return res.json({
       success: true,
       freedSeats: seatIds,
     });
+
   } catch (err) {
-    console.error("CancelBooking Error:", err);
+    console.error("CANCEL ERROR:", err);
     return res.status(500).json({
-      error: "Failed to cancel booking",
+      success: false,
+      error: "Cancel failed",
     });
   }
 };
