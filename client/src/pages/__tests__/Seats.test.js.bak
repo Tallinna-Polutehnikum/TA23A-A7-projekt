@@ -1,0 +1,70 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { mount } from '@vue/test-utils';
+import Seats from '../Seats.vue';
+
+// Mock vue-router
+vi.mock('vue-router', () => ({
+  useRoute: () => ({ query: { id: '10' } }),
+  useRouter: () => ({ push: vi.fn() })
+}));
+
+// Mock fetch
+global.fetch = vi.fn();
+
+describe('Seats.vue - Logic Tests', () => {
+  let wrapper;
+  let vm;
+
+  beforeEach(async () => {
+    // Mock successful API response
+    global.fetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ 
+        movie_id: 1, 
+        show_date: '2026-05-20', 
+        show_time: '18:00:00', 
+        location: 'Cinema City' 
+      })
+    });
+    
+    wrapper = mount(Seats);
+    await wrapper.vm.$nextTick();
+    vm = wrapper.vm;
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('increaseTickets adds 1 when below 10', () => {
+    vm.tickets = 2;
+    vm.increaseTickets();
+    expect(vm.tickets).toBe(3);
+  });
+
+  it('decreaseTickets subtracts 1 when above 1', () => {
+    vm.tickets = 5;
+    vm.decreaseTickets();
+    expect(vm.tickets).toBe(4);
+  });
+
+  it('decreaseTickets does not go below 1', () => {
+    vm.tickets = 1;
+    vm.decreaseTickets();
+    expect(vm.tickets).toBe(1);
+  });
+
+  it('increaseTickets does not go above 10', () => {
+    vm.tickets = 10;
+    vm.increaseTickets();
+    expect(vm.tickets).toBe(10);
+  });
+
+  it('ticketPrice is 8.54', () => {
+    expect(vm.ticketPrice).toBe(8.54);
+  });
+
+  it('seatType defaults to single', () => {
+    expect(vm.seatType).toBe('single');
+  });
+});
